@@ -9,9 +9,6 @@ import Information from "./pages/Information";
 import TitleBar from "./components/ActionBar/TitleBar";
 import Authentication from "./pages/Authentication";
 
-// ! testing
-import axios from "axios";
-
 function App() {
   return (
     <div className="app">

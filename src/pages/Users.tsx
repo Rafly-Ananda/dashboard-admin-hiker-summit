@@ -2,7 +2,6 @@ import { FC, useEffect, useState } from "react";
 import axios from "axios";
 import styles from "./scss/users.module.scss";
 import { User } from "../interfaces";
-import { BASE_URL } from "../config";
 import { Navigate, Route, Routes } from "react-router-dom";
 import UserDetails from "../components/User/UserDetails";
 import UserTable from "../components/User/UserTable";
