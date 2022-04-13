@@ -1,0 +1,18 @@
+@import "../../scss/mixins";
+@import "../../scss/variables";
+
+.page__wrapper {
+  height: 100%;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  position: relative;
+
+  .loading {
+    @include flex-boiler;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+}

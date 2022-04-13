@@ -1,0 +1,16 @@
+@import "../../../scss/mixins";
+@import "../../../scss/variables";
+
+.wrapper {
+  @include flex-boiler;
+  justify-content: space-between;
+  height: 100%;
+
+  .left {
+    margin-left: 2em;
+  }
+
+  .right {
+    margin-right: 2em;
+  }
+}

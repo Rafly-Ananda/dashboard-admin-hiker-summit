@@ -1,0 +1,35 @@
+@mixin flex-boiler {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin btn-style {
+  width: 8vw;
+  border-radius: 0.75em;
+  font-size: medium;
+  font-weight: 400;
+}
+
+@mixin element-hidden {
+  display: none;
+}
+
+@mixin glassmorphism {
+  background: $soft-white;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  backdrop-filter: blur(12.5px);
+  -webkit-backdrop-filter: blur(12.5px);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+@mixin neumorphism {
+  // border-radius: 6px;
+  // background: #ffffff;
+  // box-shadow: 10px 10px 30px #d9d9d9, -10px -10px 30px #ffffff;
+
+  border-radius: 11px;
+  background: #f7f8fc;
+  box-shadow: 10px 10px 20px #c6c6ca, -10px -10px 20px #ffffff;
+}

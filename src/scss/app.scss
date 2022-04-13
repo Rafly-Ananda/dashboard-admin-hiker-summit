@@ -1,0 +1,30 @@
+@import "./mixins";
+@import "./variables";
+
+.app {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+
+  nav {
+    flex: 1;
+  }
+
+  main {
+    @include flex-boiler;
+    flex-direction: column;
+    flex: 6;
+    background-color: #f7f8fc;
+    padding: 2em;
+
+    .main_top {
+      flex: 1;
+      width: 100%;
+    }
+
+    .main_bottom {
+      flex: 10;
+      width: 100%;
+    }
+  }
+}
