@@ -1,73 +1,106 @@
 import { FC, useEffect, useState } from "react";
-import axios from "axios";
-import styles from "./scss/users.module.scss";
 import { User } from "../interfaces";
-import { Navigate, Route, Routes } from "react-router-dom";
-import UserDetails from "../components/User/UserDetails";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import UserTable from "../components/User/UserTable";
-import Spinner from "../components/Spinner/Spinner";
-
-interface ComponentProps {
-  fetchUsers: () => string;
-}
+import UserEditForm from "../components/User/UserEditForm";
 
 const Users: FC = () => {
+  const axiosPrivate = useAxiosPrivate();
   const [users, setUsers] = useState<Array<User>>([]);
-  const [loading, setLoading] = useState<Boolean>(false);
-  const [error, setError] = useState<Boolean>(false);
+  const [isFetching, setIsFetching] = useState<boolean>(false);
+  const [openEditModal, setOpenEditModal] = useState<boolean>(false);
+  const [user, setUser] = useState<User>({
+    profile_picture: "",
+    _id: "",
+    email: "",
+    username: "",
+    first_name: "",
+    last_name: "",
+    phone_number: "",
+    destination_wishlist: [],
+    user_status: "",
+    is_admin: false,
+    createdAt: "",
+    updatedAt: "",
+    accessToken: "",
+  });
 
-  const fetchUsers = async (): Promise<void> => {
+  const handelDeleteUser = async (userId: string): Promise<void> => {
     try {
-      const response = await axios.get(`api/v1/users`, {
-        headers: {
-          token:
-            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyNTQ0NTVlMjJlYjUwNjUwMzY2MzQzZCIsImlzX2FkbWluIjp0cnVlLCJpYXQiOjE2NDk4NjU0NDIsImV4cCI6MTY0OTg2OTA0Mn0.9c30kDK0P4zBGoUeiKjT44VjjY2ijCN8vAvLLMbMVsQ",
-        },
-      });
-
-      setUsers(response.data.result.docs);
-    } catch (error) {
-      console.error(error);
+      await axiosPrivate.delete(`api/v1/users/${userId}`);
+      setUsers((prevUser) => prevUser.filter((user) => user._id != userId));
+    } catch (e) {
+      console.warn(e);
     }
   };
 
-  const deleteUser = async (userId: string): Promise<void> => {
-    setLoading(true);
+  const handleUpdateUser = async (
+    e: React.FormEvent<HTMLFormElement>,
+    id: string
+  ) => {
+    e.preventDefault();
     try {
-      await axios.delete(`api/v1/users/${userId}`, {
-        headers: {
-          token:
-            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyNTQ0NTVlMjJlYjUwNjUwMzY2MzQzZCIsImlzX2FkbWluIjp0cnVlLCJpYXQiOjE2NDk4NjU0NDIsImV4cCI6MTY0OTg2OTA0Mn0.9c30kDK0P4zBGoUeiKjT44VjjY2ijCN8vAvLLMbMVsQ",
-        },
+      await axiosPrivate.put(`/api/v1/users/${id}`, user);
+      console.log("success");
+      setUsers((prevUsers) => {
+        // TODO : make a redux out of this
+        const usersIndex = prevUsers.findIndex(
+          (targetUser) => targetUser._id === user._id
+        );
+        prevUsers[usersIndex] = user;
+        return prevUsers;
       });
-      setLoading(false);
-      fetchUsers();
-    } catch (error) {
-      console.error(error);
+      setOpenEditModal(false);
+    } catch (e) {
+      console.warn(e);
     }
   };
 
   useEffect(() => {
+    let isMounted = true;
+    const controller = new AbortController();
+
+    const fetchUsers = async (): Promise<void> => {
+      try {
+        setIsFetching(true);
+        const { data } = await axiosPrivate.get(`/api/v1/users`, {
+          signal: controller.signal,
+        });
+        isMounted && setUsers(data.result.docs);
+        setIsFetching(false);
+      } catch (e) {
+        console.warn(e);
+      }
+    };
+
     fetchUsers();
+
+    // ? cleanup function useEffect
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
   }, []);
 
   return (
-    <div className={styles.page__wrapper}>
-      {loading ? (
-        <div className={styles.loading}>
-          <Spinner />
-        </div>
-      ) : (
-        <Routes>
-          <Route
-            path="/"
-            element={<UserTable data={users} deleteUser={deleteUser} />}
-          />
-          <Route path="/:id" element={<UserDetails />} />
-          <Route path="*" element={<Navigate to={"/users"} />} />
-        </Routes>
+    <>
+      {openEditModal && (
+        <UserEditForm
+          openEditModal={openEditModal}
+          setOpenEditModal={setOpenEditModal}
+          users={users}
+          user={user}
+          setUser={setUser}
+          handleUpdateUser={handleUpdateUser}
+        />
       )}
-    </div>
+      <UserTable
+        handleDeleteUser={handelDeleteUser}
+        setOpenEditModal={setOpenEditModal}
+        isFetching={isFetching}
+        users={users}
+      />
+    </>
   );
 };
 

@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { DestinationProps } from "../interfaces";
+import { DestinationProps } from "../../interfaces";
 
 const DestinationCard: FC<DestinationProps> = (props) => {
   return (
