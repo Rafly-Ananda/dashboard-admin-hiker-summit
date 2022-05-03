@@ -1,6 +1,24 @@
 @import url("https://fonts.googleapis.com/css2?family=Mulish:wght@200;300;400;500;600&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap");
 
+body {
+  background-color: #f7f8fc;
+
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: #e4e4e4;
+    border-radius: 100px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #363740;
+    border-radius: 100px;
+  }
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;

@@ -10,7 +10,10 @@ const Users: FC = () => {
   const [isFetching, setIsFetching] = useState<boolean>(false);
   const [openEditModal, setOpenEditModal] = useState<boolean>(false);
   const [user, setUser] = useState<User>({
-    profile_picture: "",
+    image_assets: {
+      bucket: "",
+      assets_key: "",
+    },
     _id: "",
     email: "",
     username: "",
@@ -66,8 +69,11 @@ const Users: FC = () => {
         const { data } = await axiosPrivate.get(`/api/v1/users`, {
           signal: controller.signal,
         });
-        isMounted && setUsers(data.result.docs);
-        setIsFetching(false);
+
+        if (isMounted) {
+          setUsers(data.result.docs);
+          setIsFetching(false);
+        }
       } catch (e) {
         console.warn(e);
       }

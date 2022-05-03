@@ -12,6 +12,7 @@ const Overview: FC = () => {
   const [destinations, setDestinations] = useState<Array<Destination>>([]);
   const [guides, setGuides] = useState<Array<Guide>>([]);
   const [bookings, setBookings] = useState<Array<Book>>([]);
+  const [isFetching, setIsFetching] = useState(false);
   const axiosPrivate = useAxiosPrivate();
 
   // TODO : make a filtration system here
@@ -25,7 +26,7 @@ const Overview: FC = () => {
       guides.filter((guide) => guide.status === "unactive").length
     ),
     createData(
-      "Menyewa pemandu || ieu urg teu ngarti",
+      "Menyewa pemandu",
       bookings.filter((book) => book.paid_status === "unpaid").length
     ),
     createData(
@@ -95,30 +96,36 @@ const Overview: FC = () => {
     const controller = new AbortController();
 
     const fetchTableData = async (): Promise<void> => {
-      const { data: Users } = await axiosPrivate.get(`/api/v1/users`, {
-        signal: controller.signal,
-      });
-
-      const { data: Destinations } = await axiosPrivate.get(
-        `/api/v1/destinations`,
-        {
+      setIsFetching(true);
+      try {
+        const { data: Users } = await axiosPrivate.get(`/api/v1/users`, {
           signal: controller.signal,
+        });
+
+        const { data: Destinations } = await axiosPrivate.get(
+          `/api/v1/destinations`,
+          {
+            signal: controller.signal,
+          }
+        );
+
+        const { data: Guides } = await axiosPrivate.get(`/api/v1/guides`, {
+          signal: controller.signal,
+        });
+
+        const { data: Bookings } = await axiosPrivate.get(`/api/v1/bookings`, {
+          signal: controller.signal,
+        });
+
+        if (isMounted) {
+          setUsers(Users.result.docs);
+          setDestinations(Destinations.result.docs);
+          setGuides(Guides.result.docs);
+          setBookings(Bookings.result.docs);
+          setIsFetching(false);
         }
-      );
-
-      const { data: Guides } = await axiosPrivate.get(`/api/v1/guides`, {
-        signal: controller.signal,
-      });
-
-      const { data: Bookings } = await axiosPrivate.get(`/api/v1/bookings`, {
-        signal: controller.signal,
-      });
-
-      if (isMounted) {
-        setUsers(Users.result.docs);
-        setDestinations(Destinations.result.docs);
-        setGuides(Guides.result.docs);
-        setBookings(Bookings.result.docs);
+      } catch (e) {
+        console.warn(e);
       }
     };
 
@@ -133,54 +140,57 @@ const Overview: FC = () => {
 
   return (
     <>
-      {/* <Box
-        sx={{
-          position: "relative",
-          height: "92%",
-        }}
-      >
-        <Spinner />
-      </Box> */}
-      <Container
-        maxWidth="xl"
-        sx={{
-          mt: 5,
-        }}
-      >
+      {isFetching ? (
         <Box
           sx={{
-            flexGrow: 1,
-            p: 5,
+            position: "relative",
+            height: "92%",
           }}
         >
-          <Grid container spacing={3}>
-            <Grid item xs={6}>
-              <GridTable
-                navigateTo="/tickets"
-                title="Tickets"
-                rows={ticketRows}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <GridTable navigateTo="/users" title="Users" rows={usersRow} />
-            </Grid>
-            <Grid item xs={6}>
-              <GridTable
-                navigateTo="/payments"
-                title="Payments"
-                rows={paymentRows}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <GridTable
-                navigateTo="/informations"
-                title="Informations"
-                rows={InformationRows}
-              />
-            </Grid>
-          </Grid>
+          <Spinner />
         </Box>
-      </Container>
+      ) : (
+        <Container
+          maxWidth="xl"
+          sx={{
+            mt: 5,
+          }}
+        >
+          <Box
+            sx={{
+              flexGrow: 1,
+              p: 5,
+            }}
+          >
+            <Grid container spacing={3}>
+              <Grid item xs={6}>
+                <GridTable
+                  navigateTo="/tickets"
+                  title="Tickets"
+                  rows={ticketRows}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <GridTable navigateTo="/users" title="Users" rows={usersRow} />
+              </Grid>
+              <Grid item xs={6}>
+                <GridTable
+                  navigateTo="/payments"
+                  title="Payments"
+                  rows={paymentRows}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <GridTable
+                  navigateTo="/informations"
+                  title="Informations"
+                  rows={InformationRows}
+                />
+              </Grid>
+            </Grid>
+          </Box>
+        </Container>
+      )}
     </>
   );
 };

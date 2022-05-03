@@ -12,6 +12,7 @@ const Offset = styled("div")(({ theme }) => theme.mixins.toolbar);
 const OutletContainer = styled(Box)<BoxProps>(({ theme }) => ({
   width: "100%",
   padding: theme.spacing(2),
+  minHeight: "100vh",
 }));
 
 const Layout = () => {

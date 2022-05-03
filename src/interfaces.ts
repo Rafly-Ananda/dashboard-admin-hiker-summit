@@ -1,5 +1,8 @@
 export interface User {
-  profile_picture: string;
+  image_assets: {
+    bucket: string;
+    assets_key: string;
+  };
   _id: string;
   email: string;
   username: string;

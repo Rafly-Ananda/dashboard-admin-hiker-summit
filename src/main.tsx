@@ -8,14 +8,11 @@ import { store } from "./redux/store";
 import { persistor } from "./redux/store";
 import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { StyledEngineProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 
 const theme = createTheme({
-  palette: {
-    background: {
-      default: "red",
-    },
-  },
+  palette: {},
   typography: {
     fontFamily: "Mulish",
     fontWeightLight: 300,
@@ -30,8 +27,10 @@ ReactDOM.render(
       <PersistGate loading={null} persistor={persistor}>
         <BrowserRouter>
           <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <App />
+            <StyledEngineProvider injectFirst>
+              <CssBaseline />
+              <App />
+            </StyledEngineProvider>
           </ThemeProvider>
         </BrowserRouter>
       </PersistGate>
