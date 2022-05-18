@@ -15,24 +15,52 @@ export interface User {
   createdAt: string;
   updatedAt: string;
   accessToken: string;
+  verified: boolean;
 }
 
-// TODO : update this interface later
+interface Track {
+  track_name: string;
+  basecamp_name: string;
+  road_name: string;
+  district: string;
+  ward: string;
+  village: string;
+  postal_code: number;
+}
+
 export interface Destination {
   _id: string;
   status: string;
-  added_by: boolean;
   title: string;
+  price_per_person: string;
+  difficulty: string;
+  like: number;
+  added_by: string;
   location: {
     province: string;
     island: string;
     city?: string;
-    district: string;
-    ward: string;
-    level: string;
+    track: Array<Track>;
   };
   content: {
-    image_galery: Array<string>;
+    general_information: string;
+    rules: {
+      attention: object;
+      obligation: object;
+      prohibition: object;
+    };
+    accessibility: object;
+    image_assets: {
+      assets_key: Array<string>;
+      bucket: string;
+    };
+    contact: {
+      name: string;
+      phone_number: string;
+      position: string;
+      location: string;
+      note: string;
+    };
   };
 }
 

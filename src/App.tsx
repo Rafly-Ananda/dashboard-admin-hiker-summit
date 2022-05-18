@@ -7,8 +7,13 @@ import Users from "./pages/Users";
 import Informations from "./pages/Informations";
 import Layout from "./components/Layout/Layout";
 import Login from "./pages/Login";
+import { useAppDispatch } from "./hooks/reduxHooks";
+import { setDestinations } from "./helpers/reduxApiCalls";
 
 function App() {
+  const dispatch = useAppDispatch();
+  setDestinations(dispatch);
+
   return (
     <Routes>
       <Route element={<Layout />}>

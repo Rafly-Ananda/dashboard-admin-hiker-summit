@@ -5,6 +5,11 @@ import {
   logoutSuccess,
   setNewToken,
 } from "../redux/slice/userSlice";
+import {
+  fetchStart,
+  fetchFail,
+  fetchSuccess,
+} from "../redux/slice/destinationsSlice";
 import { axiosPublic } from "../api/axiosInstance";
 
 export const login = async (dispatch: any, user: object) => {
@@ -38,5 +43,17 @@ export const setNewAccessToken = async (dispatch: any, token: string) => {
     dispatch(setNewToken(token));
   } catch (err) {
     dispatch(actionFailure());
+  }
+};
+
+export const setDestinations = async (dispatch: any) => {
+  dispatch(fetchStart());
+  try {
+    const {
+      data: { result },
+    } = await axiosPublic.get(`api/v1/destinations/`);
+    dispatch(fetchSuccess(result.docs));
+  } catch (err) {
+    dispatch(fetchFail());
   }
 };

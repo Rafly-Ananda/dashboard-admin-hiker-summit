@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC } from "react";
 import AppBar, { AppBarProps } from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
@@ -6,7 +6,6 @@ import Avatar from "@mui/material/Avatar";
 import { User } from "../../interfaces";
 import { styled } from "@mui/material/styles";
 import { drawerWidth } from "../../config";
-import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 
 interface ComponentProps {
   user: User | null;

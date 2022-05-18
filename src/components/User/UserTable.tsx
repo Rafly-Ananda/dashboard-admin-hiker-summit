@@ -9,7 +9,7 @@ import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
-import Row from "./UserRow";
+import UserRow from "./UserRow";
 import Spinner from "../Spinner/Spinner";
 import { User } from "../../interfaces";
 
@@ -66,7 +66,7 @@ const UserTable: FC<ComponentProps> = ({
             sx={{
               padding: 2,
               borderRadius: 3,
-              backgroundColor: "#f7f8fc",
+              backgroundColor: "#fff",
               boxShadow: 3,
             }}
           >
@@ -89,8 +89,8 @@ const UserTable: FC<ComponentProps> = ({
                     )
                   : users
                 ).map((user) => (
-                  <Row
-                    key={user.username}
+                  <UserRow
+                    key={user._id}
                     user={user}
                     handleDeleteUser={handleDeleteUser}
                     setOpenEditModal={setOpenEditModal}

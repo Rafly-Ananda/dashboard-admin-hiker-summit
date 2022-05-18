@@ -18,9 +18,6 @@ const Tickets = () => {
     }));
   };
 
-  console.log(xoxo);
-  console.log(address);
-
   return (
     <div
       style={{

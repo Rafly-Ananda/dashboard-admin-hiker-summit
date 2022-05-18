@@ -1,9 +1,9 @@
+import * as React from "react";
 import { FC, useEffect } from "react";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { TransitionProps } from "@mui/material/transitions";
 import { useNavigate } from "react-router-dom";
 import { User } from "../../interfaces";
-import * as React from "react";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
@@ -67,13 +67,13 @@ const UserEditForm: FC<ComponentProps> = ({
 
   const handleChangeStateSelect = (e: SelectChangeEvent) => {
     const { name, value } = e.target;
-    let isAdminBool: boolean = false;
+    let boolState: boolean = false;
     if (value === "True" || value === "False") {
-      isAdminBool = value === "True" ? true : false;
+      boolState = value === "True" ? true : false;
     }
     setUser((prevState) => ({
       ...prevState,
-      [name]: value === "True" || value === "False" ? isAdminBool : value,
+      [name]: value === "True" || value === "False" ? boolState : value,
     }));
   };
 
@@ -103,7 +103,6 @@ const UserEditForm: FC<ComponentProps> = ({
               value={user?.email}
               onChange={handleChangeStateString}
               fullWidth
-              disabled
               variant="outlined"
             />
 
@@ -115,7 +114,6 @@ const UserEditForm: FC<ComponentProps> = ({
               value={user?.username}
               onChange={handleChangeStateString}
               fullWidth
-              disabled
               variant="outlined"
             />
 
@@ -163,6 +161,20 @@ const UserEditForm: FC<ComponentProps> = ({
               >
                 <MenuItem value={"umum"}>Umum</MenuItem>
                 <MenuItem value={"guide"}>Guide</MenuItem>
+              </Select>
+            </FormControl>
+
+            <FormControl fullWidth margin="normal">
+              <InputLabel id="verified_option">Is Verified</InputLabel>
+              <Select
+                id="verified_option"
+                name="verified"
+                value={user?.verified ? "True" : "False"}
+                label="Is Verified"
+                onChange={handleChangeStateSelect}
+              >
+                <MenuItem value={"True"}>True</MenuItem>
+                <MenuItem value={"False"}>False</MenuItem>
               </Select>
             </FormControl>
 

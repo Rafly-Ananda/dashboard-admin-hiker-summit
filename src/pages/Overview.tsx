@@ -96,8 +96,8 @@ const Overview: FC = () => {
     const controller = new AbortController();
 
     const fetchTableData = async (): Promise<void> => {
-      setIsFetching(true);
       try {
+        setIsFetching(true);
         const { data: Users } = await axiosPrivate.get(`/api/v1/users`, {
           signal: controller.signal,
         });

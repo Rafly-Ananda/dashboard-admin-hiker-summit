@@ -37,13 +37,9 @@ export const userSlice = createSlice({
       state.isLoggedIn = false;
       state.currentUser = null;
     },
-    setNewToken: (state, action: PayloadAction<any>) => {
+    setNewToken: (state, action: PayloadAction<string>) => {
       state.isFetching = false;
       state.currentUser!.accessToken = action.payload;
-    },
-    removeToken: (state) => {
-      state.isFetching = false;
-      state.currentUser!.accessToken = "";
     },
   },
 });

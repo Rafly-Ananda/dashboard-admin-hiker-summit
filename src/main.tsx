@@ -12,12 +12,8 @@ import { StyledEngineProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 
 const theme = createTheme({
-  palette: {},
   typography: {
     fontFamily: "Mulish",
-    fontWeightLight: 300,
-    fontWeightRegular: 400,
-    fontWeightMedium: 500,
   },
 });
 

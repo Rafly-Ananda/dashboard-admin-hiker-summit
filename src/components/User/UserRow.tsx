@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -7,13 +7,14 @@ import Collapse from "@mui/material/Collapse";
 import IconButton from "@mui/material/IconButton";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
-import Typography from "@mui/material/Typography";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import Button from "@mui/material/Button";
+import Avatar from "@mui/material/Avatar";
 import { styled } from "@mui/material/styles";
-import { User } from "../../interfaces";
+import { User, Destination } from "../../interfaces";
 import { useNavigate } from "react-router-dom";
+import { useAppSelector } from "../../hooks/reduxHooks";
 
 interface RowProp {
   user: User;
@@ -22,13 +23,14 @@ interface RowProp {
 }
 
 const CardDetails = styled("div")(({ theme }) => ({
-  backgroundColor: "#f7f8fc",
   display: "flex",
   flexDirection: "row",
 }));
 
 const UserRow: FC<RowProp> = ({ user, handleDeleteUser, setOpenEditModal }) => {
+  const { destinations } = useAppSelector((state) => state.destinations);
   const [open, setOpen] = useState<boolean>(false);
+  const [destinationWl, setDestinationWl] = useState();
   const navigate = useNavigate();
 
   const formatDate = (date: any) => {
@@ -40,6 +42,16 @@ const UserRow: FC<RowProp> = ({ user, handleDeleteUser, setOpenEditModal }) => {
     });
     return formattedDate;
   };
+
+  // useEffect(() => {
+  //   setDestinationWl(
+  //     destinations?.docs.filter((destination) =>
+  //       user.destination_wishlist.includes(destination._id)
+  //     )
+  //   );
+  // }, []);
+
+  // console.log(destinationWl);
 
   return (
     <>
@@ -54,7 +66,19 @@ const UserRow: FC<RowProp> = ({ user, handleDeleteUser, setOpenEditModal }) => {
           </IconButton>
         </TableCell>
         <TableCell component="th" scope="row">
-          {user.username}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <Avatar
+              alt={user?.username}
+              src={`http://localhost:3000/api/v1/assets?bucket=${user?.image_assets.bucket}&key=${user?.image_assets.assets_key}`}
+              sx={{ width: 40, height: 40, marginRight: 2 }}
+            />
+            {user.username}
+          </Box>
         </TableCell>
         <TableCell>{user.email}</TableCell>
         <TableCell>{user.is_admin ? "True" : "False"}</TableCell>
@@ -88,16 +112,19 @@ const UserRow: FC<RowProp> = ({ user, handleDeleteUser, setOpenEditModal }) => {
       <TableRow>
         <TableCell sx={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box component="div" sx={{ margin: 5 }}>
-              {/* <Typography variant="h6" fontWeight={600} gutterBottom>
-                Details
-              </Typography> */}
+            <Box
+              component="div"
+              sx={{ margin: 5, display: "flex", justifyContent: "center" }}
+            >
               <Box
                 component="div"
                 sx={{
                   display: "flex",
+                  width: "50%",
                   justifyContent: "space-evenly",
-                  boxShadow: 2,
+                  padding: 2,
+                  borderRadius: 3,
+                  boxShadow: 1,
                 }}
               >
                 <CardDetails>
@@ -150,15 +177,28 @@ const UserRow: FC<RowProp> = ({ user, handleDeleteUser, setOpenEditModal }) => {
                     </ListItem>
                     <ListItem>
                       <ListItemText
-                        primary="Destination Wishlist"
-                        secondary={
-                          user?.destination_wishlist &&
-                          user?.destination_wishlist.length > 0
-                            ? user?.destination_wishlist
-                            : " -"
-                        }
+                        primary="Is Verified"
+                        secondary={user.verified ? "True" : "False"}
                       />
                     </ListItem>
+
+                    {/* 
+                    <List dense>
+                      {user?.destination_wishlist && destinations
+                        ? destinations.map((destination, i) => (
+                            <ListItem key={(user._id + destination, i)}>
+                              <ListItemText
+                                secondary={`${
+                                  user.destination_wishlist.includes(
+                                    destination._id
+                                  ) && `Gunung ${destination.title}`
+                                }`}
+                              />
+                            </ListItem>
+                          ))
+                        : " -"}
+                    </List> */}
+
                     <ListItem>
                       <ListItemText
                         primary="Created At"
