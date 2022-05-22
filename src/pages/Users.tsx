@@ -77,20 +77,24 @@ const Users: FC = () => {
           setIsFetching(false);
         }
       } catch (e) {
-        console.warn(e);
+        if (e instanceof Error) {
+          if (e.message === "canceled") {
+            return;
+          } else {
+            console.error(e);
+          }
+        }
       }
     };
 
     // TODO: NEED TO REDUX THIS
     const getDestination = async (): Promise<void> => {
       try {
-        const {
-          data: { result },
-        } = await axiosPublic.get(`api/v1/destinations/`, {
+        const { data } = await axiosPublic.get(`api/v1/destinations/`, {
           signal: controller.signal,
         });
 
-        isMounted && setDestinations(result.docs);
+        isMounted && setDestinations(data.result.docs);
       } catch (e) {
         console.warn(e);
       }

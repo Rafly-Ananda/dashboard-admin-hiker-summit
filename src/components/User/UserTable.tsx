@@ -70,7 +70,7 @@ const UserTable: FC<ComponentProps> = ({
               boxShadow: 3,
             }}
           >
-            <Table aria-label="collapsible table">
+            <Table>
               <TableHead>
                 <TableRow>
                   <TableCell sx={{ width: "5%" }} />

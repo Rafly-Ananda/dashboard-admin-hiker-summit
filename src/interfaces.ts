@@ -19,6 +19,7 @@ export interface User {
 }
 
 interface Track {
+  description: string;
   track_name: string;
   basecamp_name: string;
   road_name: string;
@@ -26,15 +27,17 @@ interface Track {
   ward: string;
   village: string;
   postal_code: number;
+  accessibility: object;
+  phone_number: number;
 }
 
 export interface Destination {
   _id: string;
   status: string;
   title: string;
-  price_per_person: string;
+  price_per_day: string;
   difficulty: string;
-  like: number;
+  likes: number;
   added_by: string;
   location: {
     province: string;

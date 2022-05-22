@@ -17,9 +17,8 @@ const ErrorSpan = styled("span")(({ theme }) => ({
 }));
 
 const Login: FC = () => {
-  const { isFetching, currentUser, error } = useAppSelector(
-    (state) => state.user
-  );
+  const { currentUser } = useAppSelector((state) => state.user);
+  const { isFetching, error } = useAppSelector((state) => state.fetch);
   const dispatch = useAppDispatch();
   const [username, setUsername] = useState<string>();
   const [password, setPassword] = useState<string>();

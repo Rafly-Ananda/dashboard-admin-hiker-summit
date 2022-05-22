@@ -96,6 +96,7 @@ const Overview: FC = () => {
     const controller = new AbortController();
 
     const fetchTableData = async (): Promise<void> => {
+      // TODO: use promise.all here
       try {
         setIsFetching(true);
         const { data: Users } = await axiosPrivate.get(`/api/v1/users`, {
@@ -124,8 +125,14 @@ const Overview: FC = () => {
           setBookings(Bookings.result.docs);
           setIsFetching(false);
         }
-      } catch (e) {
-        console.warn(e);
+      } catch (e: unknown) {
+        if (e instanceof Error) {
+          if (e.message === "canceled") {
+            return;
+          } else {
+            console.error(e);
+          }
+        }
       }
     };
 

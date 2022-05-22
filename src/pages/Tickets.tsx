@@ -1,21 +1,19 @@
 import { useState } from "react";
 
 const Tickets = () => {
-  const [address, setAddress] = useState({
-    location: {
-      track: [],
-    },
-  });
-
-  const [xoxo, setXoxo] = useState({});
+  // const [address, setAddress] = useState({
+  //   location: {
+  //     track: [],
+  //   },
+  // });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("clicked");
-    setAddress((prev) => ({
-      ...prev,
-      location: { ...prev.location, track: Object.values(xoxo) },
-    }));
+    // setAddress((prev) => ({
+    //   ...prev,
+    //   location: { ...prev.location, track: Object.values(xoxo) },
+    // }));
   };
 
   return (
@@ -24,7 +22,7 @@ const Tickets = () => {
         marginTop: "50px",
       }}
     >
-      <form
+      {/* <form
         style={{ display: "flex", flexDirection: "column", maxWidth: "40%" }}
         onSubmit={handleSubmit}
       >
@@ -255,7 +253,7 @@ const Tickets = () => {
         />
 
         <button style={{ maxWidth: "20%", marginTop: "20px" }}>submit</button>
-      </form>
+      </form> */}
     </div>
   );
 };

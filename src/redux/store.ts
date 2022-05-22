@@ -16,18 +16,22 @@ import {
 } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import userReducer from "./slice/userSlice";
+import usersReducer from "./slice/usersSlice";
 import DestinationReducer from "./slice/destinationsSlice";
+import FetchStatusReducer from "./slice/fetchStatusSlice";
 
 const persistConfig = {
   key: "root",
   version: 1,
-  blacklist: ["destinations"],
+  blacklist: ["destinations", "users", "fetch"],
   storage,
 };
 
 const rootReducer = combineReducers({
   user: userReducer,
   destinations: DestinationReducer,
+  users: usersReducer,
+  fetch: FetchStatusReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

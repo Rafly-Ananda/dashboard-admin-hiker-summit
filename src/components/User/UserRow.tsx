@@ -74,7 +74,11 @@ const UserRow: FC<RowProp> = ({ user, handleDeleteUser, setOpenEditModal }) => {
           >
             <Avatar
               alt={user?.username}
-              src={`http://localhost:3000/api/v1/assets?bucket=${user?.image_assets.bucket}&key=${user?.image_assets.assets_key}`}
+              src={
+                user.image_assets.assets_key
+                  ? `api/v1/assets?bucket=${user?.image_assets.bucket}&key=${user?.image_assets.assets_key}`
+                  : "#"
+              }
               sx={{ width: 40, height: 40, marginRight: 2 }}
             />
             {user.username}

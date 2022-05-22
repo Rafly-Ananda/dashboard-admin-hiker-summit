@@ -1,38 +1,60 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Destination } from "../../interfaces";
 
-interface UserState {
+interface DestinationsState {
   destinations: Destination[] | null;
-  isFetching: boolean;
-  error: boolean;
+  isDestinationsFetching: boolean;
+  destinationsFetchError: boolean;
 }
 
-const initialState: UserState = {
+const initialState: DestinationsState = {
   destinations: null,
-  isFetching: false,
-  error: false,
+  isDestinationsFetching: false,
+  destinationsFetchError: false,
 };
 
 export const destinationsSlice = createSlice({
-  name: "destination",
+  name: "destinations",
   initialState,
   reducers: {
-    fetchStart: (state) => {
-      state.isFetching = true;
-      state.error = false;
+    destinationsActionsStart: (state) => {
+      state.isDestinationsFetching = true;
+      state.destinationsFetchError = false;
     },
-    fetchFail: (state) => {
-      state.isFetching = false;
-      state.error = true;
+    destinationsActionsFailure: (state) => {
+      state.isDestinationsFetching = false;
+      state.destinationsFetchError = true;
     },
-    fetchSuccess: (state, action: PayloadAction<Array<Destination>>) => {
-      state.isFetching = false;
+    // ? change below method to fetchdestinationsuccess later
+    fetchdestinationsuccess: (
+      state,
+      action: PayloadAction<Array<Destination>>
+    ) => {
       state.destinations = action.payload;
+    },
+    // TODO: this reducer is only for deleting images
+    modifyDestination: (
+      state,
+      action: PayloadAction<{ key: string; destinationId: string }>
+    ) => {
+      const { destinationId, key } = action.payload;
+      const targetDestination = state.destinations?.find(
+        (dest) => dest._id === destinationId
+      );
+      if (targetDestination) {
+        targetDestination.content.image_assets.assets_key =
+          targetDestination.content.image_assets.assets_key.filter(
+            (assetsKey) => assetsKey !== key
+          );
+      }
     },
   },
 });
 
-export const { fetchStart, fetchFail, fetchSuccess } =
-  destinationsSlice.actions;
-
+export const {
+  destinationsActionsStart,
+  destinationsActionsFailure,
+  fetchdestinationsuccess,
+  modifyDestination,
+} = destinationsSlice.actions;
 export default destinationsSlice.reducer;

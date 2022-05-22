@@ -39,6 +39,15 @@ const InformationsTable: FC<ComponentProps> = ({ tableTitle }) => {
     setPage(0);
   };
 
+  // const handleDeleteUser = (id: string): Promise<void> => {
+  //   try {
+  //     await axiosPrivate.delete(`api/v1/users/${userId}`);
+  //     setUsers((prevUser) => prevUser.filter((user) => user._id != userId));
+  //   } catch (e) {
+  //     console.warn(e);
+  //   }
+  // }
+
   return (
     <>
       {
@@ -99,7 +108,7 @@ const InformationsTable: FC<ComponentProps> = ({ tableTitle }) => {
                   )?.map((destination) => (
                     <InformationRow
                       key={destination._id}
-                      destinationName={destination.title}
+                      destination={destination}
                     />
                   ))}
 
