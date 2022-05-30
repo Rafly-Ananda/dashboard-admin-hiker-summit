@@ -20,7 +20,7 @@ const InformationRow: FC<ComponentProps> = ({ destination }) => {
       </TableCell>
       <TableCell align="right" sx={{ paddingRight: 8 }}>
         <Link
-          to={`/informations/${destination._id}`}
+          to={`/informations/view/${destination._id}`}
           style={{
             color: "#9fa2b4",
             textDecoration: "none",

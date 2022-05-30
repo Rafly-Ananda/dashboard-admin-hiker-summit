@@ -31,6 +31,18 @@ interface Track {
   phone_number: number;
 }
 
+export interface DestinationRules {
+  attention: {
+    [key: string]: string;
+  };
+  obligation: {
+    [key: string]: string;
+  };
+  prohibition: {
+    [key: string]: string;
+  };
+}
+
 export interface Destination {
   _id: string;
   status: string;
@@ -47,11 +59,7 @@ export interface Destination {
   };
   content: {
     general_information: string;
-    rules: {
-      attention: object;
-      obligation: object;
-      prohibition: object;
-    };
+    rules: DestinationRules;
     accessibility: object;
     image_assets: {
       assets_key: Array<string>;

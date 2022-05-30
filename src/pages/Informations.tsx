@@ -5,12 +5,11 @@ import { Outlet } from "react-router-dom";
 import { useAppSelector } from "../hooks/reduxHooks";
 
 const Informations: FC = () => {
-  // ! this is a problem
-  // const isFetching = useAppSelector((state) => state.fetch.isFetching);
+  const isFetching = useAppSelector((state) => state.fetch.isFetching);
 
   return (
     <>
-      {false ? (
+      {isFetching ? (
         <Box
           sx={{
             position: "relative",

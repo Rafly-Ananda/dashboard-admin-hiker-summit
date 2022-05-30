@@ -18,9 +18,11 @@ interface ComponentProps {
 }
 
 const InformationsTable: FC<ComponentProps> = ({ tableTitle }) => {
-  const { destinations } = useAppSelector((state) => state.destinations);
   const [page, setPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(5);
+  const { destinations } = useAppSelector(
+    (state) => state.destinations.present
+  );
   const filteredDestination = destinations?.filter(
     (destination) => destination.location.island === tableTitle
   );
@@ -39,118 +41,101 @@ const InformationsTable: FC<ComponentProps> = ({ tableTitle }) => {
     setPage(0);
   };
 
-  // const handleDeleteUser = (id: string): Promise<void> => {
-  //   try {
-  //     await axiosPrivate.delete(`api/v1/users/${userId}`);
-  //     setUsers((prevUser) => prevUser.filter((user) => user._id != userId));
-  //   } catch (e) {
-  //     console.warn(e);
-  //   }
-  // }
-
   return (
     <>
-      {
-        <Container
-          maxWidth="xl"
+      <Container
+        maxWidth="xl"
+        sx={{
+          mt: 5,
+          p: 5,
+        }}
+      >
+        <TableContainer
           sx={{
-            mt: 5,
-            p: 5,
+            padding: 2,
+            borderRadius: 3,
+            backgroundColor: "#fff",
+            boxShadow: 3,
           }}
         >
-          <TableContainer
-            sx={{
-              padding: 2,
-              borderRadius: 3,
-              backgroundColor: "#fff",
-              boxShadow: 3,
-            }}
-          >
-            <Typography
-              variant="h5"
-              component="h2"
-              sx={{ m: 2, fontWeight: "bold" }}
-            >
-              Pulau {tableTitle[0].toUpperCase() + tableTitle.slice(1)}
-            </Typography>
-            {filteredDestination && filteredDestination.length > 0 ? (
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ paddingLeft: 5 }}>
-                      <Typography
-                        variant="subtitle1"
-                        fontWeight={800}
-                        color="#9fa2b4"
-                      >
-                        Destination Name
-                      </Typography>
-                    </TableCell>
-                    <TableCell
-                      align="right"
-                      sx={{
-                        paddingRight: 10,
-                      }}
+          <Typography variant="h5" component="h2" fontWeight="bold" m={2}>
+            Pulau {tableTitle[0].toUpperCase() + tableTitle.slice(1)}
+          </Typography>
+          {filteredDestination && filteredDestination.length > 0 ? (
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ paddingLeft: 5 }}>
+                    <Typography
+                      variant="subtitle1"
+                      fontWeight={800}
+                      color="#9fa2b4"
                     >
-                      <Typography fontWeight={800} color="#9fa2b4">
-                        Action
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {(filteredDestination && rowsPerPage > 0
-                    ? filteredDestination.slice(
-                        page * rowsPerPage,
-                        page * rowsPerPage + rowsPerPage
-                      )
-                    : filteredDestination
-                  )?.map((destination) => (
-                    <InformationRow
-                      key={destination._id}
-                      destination={destination}
-                    />
-                  ))}
+                      Destination Name
+                    </Typography>
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    sx={{
+                      paddingRight: 10,
+                    }}
+                  >
+                    <Typography fontWeight={800} color="#9fa2b4">
+                      Action
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {(filteredDestination && rowsPerPage > 0
+                  ? filteredDestination.slice(
+                      page * rowsPerPage,
+                      page * rowsPerPage + rowsPerPage
+                    )
+                  : filteredDestination
+                )?.map((destination) => (
+                  <InformationRow
+                    key={destination._id}
+                    destination={destination}
+                  />
+                ))}
 
-                  {emptyRows > 0 && (
-                    <TableRow style={{ height: 53 * emptyRows }}>
-                      <TableCell colSpan={5} />
-                    </TableRow>
-                  )}
-                </TableBody>
-                <TableFooter>
-                  <TableRow>
-                    <TablePagination
-                      rowsPerPageOptions={[5, 10]}
-                      labelRowsPerPage={<span>Rows Per Page : </span>}
-                      count={filteredDestination?.length as number}
-                      rowsPerPage={rowsPerPage}
-                      page={page}
-                      onPageChange={handleChangePage}
-                      onRowsPerPageChange={handleChangeRowsPerPage}
-                      showFirstButton={true}
-                      showLastButton={true}
-                    />
+                {emptyRows > 0 && (
+                  <TableRow style={{ height: 53 * emptyRows }}>
+                    <TableCell colSpan={5} />
                   </TableRow>
-                </TableFooter>
-              </Table>
-            ) : (
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  m: 9,
-                }}
-              >
-                <Typography variant="h5" fontWeight={700} color="#9fa2b4">
-                  No Information
-                </Typography>
-              </Box>
-            )}
-          </TableContainer>
-        </Container>
-      }
+                )}
+              </TableBody>
+              <TableFooter>
+                <TableRow>
+                  <TablePagination
+                    rowsPerPageOptions={[5, 10]}
+                    labelRowsPerPage={<span>Rows Per Page : </span>}
+                    count={filteredDestination?.length as number}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                    showFirstButton={true}
+                    showLastButton={true}
+                  />
+                </TableRow>
+              </TableFooter>
+            </Table>
+          ) : (
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              m={9}
+            >
+              <Typography variant="h5" fontWeight={700} color="#9fa2b4">
+                No Information
+              </Typography>
+            </Box>
+          )}
+        </TableContainer>
+      </Container>
     </>
   );
 };

@@ -158,6 +158,7 @@ const UserEditForm: FC<ComponentProps> = ({
                 value={user?.user_status}
                 label="User Status"
                 onChange={handleChangeStateSelect}
+                disabled
               >
                 <MenuItem value={"umum"}>Umum</MenuItem>
                 <MenuItem value={"guide"}>Guide</MenuItem>

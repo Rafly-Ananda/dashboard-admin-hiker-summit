@@ -1,28 +1,57 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import MainTable from "../components/Tickets/MainTable";
+import axios from "axios";
+import { useAppSelector } from "../hooks/reduxHooks";
 
 const Tickets = () => {
-  // const [address, setAddress] = useState({
-  //   location: {
-  //     track: [],
-  //   },
-  // });
+  const [guides, setGuides] = useState();
+  const { users } = useAppSelector((state) => state.users);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    console.log("clicked");
-    // setAddress((prev) => ({
-    //   ...prev,
-    //   location: { ...prev.location, track: Object.values(xoxo) },
-    // }));
-  };
+  useEffect(() => {
+    let isMounted = true;
+    const controller = new AbortController();
 
-  return (
-    <div
-      style={{
-        marginTop: "50px",
-      }}
-    >
-      {/* <form
+    (async () => {
+      try {
+        const {
+          data: {
+            result: { docs },
+          },
+        } = await axios.get("/api/v1/guides");
+        isMounted && setGuides(docs.filter((e: any) => e.approved === false));
+      } catch (e) {
+        console.warn(e);
+      }
+    })();
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
+  }, []);
+
+  return <> {users && guides && <MainTable guides={guides} users={users} />}</>;
+};
+
+export default Tickets;
+
+// const [address, setAddress] = useState({
+//   location: {
+//     track: [],
+//   },
+// });
+
+// const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+//   e.preventDefault();
+//   console.log("clicked");
+//   // setAddress((prev) => ({
+//   //   ...prev,
+//   //   location: { ...prev.location, track: Object.values(xoxo) },
+//   // }));
+// };
+
+{
+  /* <form
         style={{ display: "flex", flexDirection: "column", maxWidth: "40%" }}
         onSubmit={handleSubmit}
       >
@@ -253,9 +282,5 @@ const Tickets = () => {
         />
 
         <button style={{ maxWidth: "20%", marginTop: "20px" }}>submit</button>
-      </form> */}
-    </div>
-  );
-};
-
-export default Tickets;
+      </form> */
+}

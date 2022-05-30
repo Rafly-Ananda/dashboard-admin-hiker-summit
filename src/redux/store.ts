@@ -19,6 +19,7 @@ import userReducer from "./slice/userSlice";
 import usersReducer from "./slice/usersSlice";
 import DestinationReducer from "./slice/destinationsSlice";
 import FetchStatusReducer from "./slice/fetchStatusSlice";
+import undoable from "redux-undo";
 
 const persistConfig = {
   key: "root",
@@ -29,7 +30,7 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
   user: userReducer,
-  destinations: DestinationReducer,
+  destinations: undoable(DestinationReducer),
   users: usersReducer,
   fetch: FetchStatusReducer,
 });

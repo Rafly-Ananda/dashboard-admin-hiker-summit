@@ -1,7 +1,5 @@
 import InformationsTable from "./InformationsTable";
-import { useAppSelector } from "../../hooks/reduxHooks";
 const InformationsHome = () => {
-  // ! PLACEHOLDER, because if destination in that island does not exist it will not render the table
   const islands = [
     "jawa",
     "sulawesi",
