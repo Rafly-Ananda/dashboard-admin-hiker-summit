@@ -11,7 +11,11 @@ import EditDestination from "./components/Destination/EditDestination";
 import Layout from "./components/Layout/Layout";
 import Login from "./pages/Login";
 import { useAppDispatch } from "./hooks/reduxHooks";
-import { fetchDestinations, setUsers } from "./helpers/reduxApiCalls";
+import {
+  fetchDestinations,
+  fetchUsers,
+  fetchBookings,
+} from "./helpers/reduxApiCalls";
 import { useEffect } from "react";
 import useAxiosPrivate from "./hooks/useAxiosPrivate";
 import { useAppSelector } from "./hooks/reduxHooks";
@@ -26,7 +30,8 @@ function App() {
     const controller = new AbortController();
 
     if (isMounted && currentUser?.is_admin) {
-      setUsers(dispatch, axiosPrivate);
+      fetchBookings(dispatch, axiosPrivate);
+      fetchUsers(dispatch, axiosPrivate);
       fetchDestinations(dispatch);
     }
 
@@ -43,7 +48,10 @@ function App() {
           <Route path="/" element={<Navigate to="/overview" replace />} />
           <Route path="overview" element={<Overview />} />
           <Route path="tickets" element={<Tickets />} />
-          <Route path="payments" element={<Payment />} />
+          <Route path="payments" element={<Payment />}>
+            {/* this is a modal so just need to render the Payment again */}
+            <Route path=":id" element={<Payment />} />
+          </Route>
           <Route path="users" element={<Users />}>
             {/* this is a modal so just need to render the users again */}
             <Route path=":id" element={<Users />} />

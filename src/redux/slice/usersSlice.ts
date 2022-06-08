@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { User } from "../../interfaces";
+import { Destination, User } from "../../interfaces";
 
 interface UsersState {
   users: User[] | null;
@@ -21,25 +21,40 @@ export const usersSlice = createSlice({
       state.isUsersFetching = true;
       state.usersFetchError = false;
     },
+
     usersFetchFailure: (state) => {
       state.isUsersFetching = false;
       state.usersFetchError = true;
     },
-    // ? change below method to fetchusersuccess later
-    fetchUsers: (state, action: PayloadAction<Array<User>>) => {
+
+    fetchUsersSuccess: (state, action: PayloadAction<Array<User>>) => {
       state.isUsersFetching = false;
       state.usersFetchError = false;
       state.users = action.payload;
     },
-    // TODO: this is not finished
-    modifiyUser: (state, action: PayloadAction<User>) => {
+
+    modifiyUser: (
+      state,
+      action: PayloadAction<{ userId: string; content: any; key: string }>
+    ) => {
       const targetUser = state.users?.find(
-        (user) => user._id === action.payload._id
+        (user) => user._id === action.payload.userId
       );
-      console.log(`the targeted user is ${targetUser}`);
+      if (targetUser) {
+        (targetUser[action.payload.key as keyof User] as any) =
+          action.payload.content;
+      }
+    },
+
+    deleteUser: (state, action: PayloadAction<string>) => {
+      console.log(action.payload);
+      if (state.users) {
+        state.users = state.users.filter((user) => user._id !== action.payload);
+      }
     },
   },
 });
 
-export const { fetchUsers } = usersSlice.actions;
+export const { fetchUsersSuccess, deleteUser, modifiyUser } =
+  usersSlice.actions;
 export default usersSlice.reducer;

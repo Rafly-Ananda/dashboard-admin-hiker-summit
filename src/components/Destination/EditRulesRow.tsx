@@ -3,7 +3,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import { Destination } from "../../interfaces";
+import { Destination, DestinationRules } from "../../interfaces";
 import {
   editRulesContent,
   addRulesField,
@@ -26,7 +26,7 @@ const EditRulesRow: FC<ComponentProps> = ({ dispatch, destination }) => {
             </Typography>
             {Object.values(e[1]).map((point, i) => (
               <TextField
-                key={point + i}
+                key={point + String(i)}
                 margin="normal"
                 id={e[0]}
                 name={e[0]}
@@ -34,12 +34,12 @@ const EditRulesRow: FC<ComponentProps> = ({ dispatch, destination }) => {
                 type="text"
                 maxRows={5}
                 defaultValue={point}
-                onBlur={(e) =>
+                onBlur={(event) =>
                   dispatch(
                     editRulesContent({
                       destination: destination,
-                      key: i as unknown as string,
-                      content: e.target.value,
+                      key: (i + 1) as unknown as string,
+                      content: event.target.value,
                       field: e[0],
                     })
                   )
@@ -55,7 +55,14 @@ const EditRulesRow: FC<ComponentProps> = ({ dispatch, destination }) => {
               variant="contained"
               color="error"
               size="medium"
-              sx={{ textTransform: "none", mr: 2, width: "10vw" }}
+              sx={{ textTransform: "none", mr: 2, width: "5vw" }}
+              disabled={
+                Object.entries(
+                  destination.content.rules[e[0] as keyof DestinationRules]
+                ).length < 2
+                  ? true
+                  : false
+              }
               onClick={() =>
                 dispatch(
                   removeRulesField({
@@ -71,7 +78,7 @@ const EditRulesRow: FC<ComponentProps> = ({ dispatch, destination }) => {
               variant="contained"
               color="primary"
               size="medium"
-              sx={{ textTransform: "none", mr: 2, width: "10vw" }}
+              sx={{ textTransform: "none", mr: 2, width: "5vw" }}
               onClick={() =>
                 dispatch(
                   addRulesField({

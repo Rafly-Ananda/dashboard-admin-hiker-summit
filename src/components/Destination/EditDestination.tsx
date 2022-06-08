@@ -1,8 +1,15 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import EditRulesRow from "./EditRulesRow";
 import EditHikingTrails from "./EditHikingTrails";
-import { editDestinationGeneralInformation } from "../../redux/slice/destinationsSlice";
-import { editDestination } from "../../helpers/reduxApiCalls";
+import {
+  editDestinationGeneralInformation,
+  editDestinationKeyObject,
+  editDestinationLocationKeyObject,
+} from "../../redux/slice/destinationsSlice";
+import {
+  deleteDestinationImage,
+  submitDestinationEditChanges,
+} from "../../helpers/reduxApiCalls";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import Container from "@mui/material/Container";
@@ -32,6 +39,7 @@ const Image = styled("img")(({ theme }) => ({
 }));
 
 const EditDestination: FC = () => {
+  const [images, setImages] = useState<any | null>(null);
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -47,13 +55,14 @@ const EditDestination: FC = () => {
     const filtered = destination?.content.image_assets.assets_key.filter(
       (assetKey) => assetKey !== key
     );
+
     const editedDestination = JSON.parse(JSON.stringify(destination));
     editedDestination.content.image_assets.assets_key = filtered && [
       ...filtered,
     ];
 
     currentUser &&
-      editDestination(
+      deleteDestinationImage(
         dispatch,
         axiosPrivate,
         key,
@@ -62,9 +71,57 @@ const EditDestination: FC = () => {
       );
   };
 
+  const handleSelectChange = (e: SelectChangeEvent) => {
+    destination &&
+      dispatch(
+        editDestinationKeyObject({
+          destination: destination,
+          content: e.target.value,
+          key: e.target.name,
+        })
+      );
+  };
+
+  const handleSelectLocationChange = (e: SelectChangeEvent) => {
+    destination &&
+      dispatch(
+        editDestinationLocationKeyObject({
+          destination: destination,
+          content: e.target.value,
+          key: e.target.name,
+        })
+      );
+  };
+
   const cancelEdit = () => {
     dispatch(ActionCreators.jumpToPast(2));
     navigate(`/informations/view/${id}`, { replace: true });
+  };
+
+  const uploadImages = async (): Promise<void> => {
+    const imageData = new FormData();
+    Object.values(images).forEach((e) =>
+      imageData.append("image", e as string | Blob)
+    );
+    imageData.append("document", JSON.stringify(destination));
+    const response = await axiosPrivate.put(
+      `/api/v1/destinations/${destination?._id}/users/${currentUser?._id}`,
+      imageData
+    );
+    console.log(response);
+  };
+
+  const submitChanges = async (): Promise<void> => {
+    images && uploadImages();
+    if (currentUser && destination) {
+      submitDestinationEditChanges(
+        dispatch,
+        axiosPrivate,
+        navigate,
+        destination,
+        currentUser
+      );
+    }
   };
 
   return (
@@ -86,11 +143,20 @@ const EditDestination: FC = () => {
                 <TextField
                   id="destination_title"
                   label="Gunung"
+                  name="title"
                   multiline
                   maxRows={4}
-                  value={destination?.title}
                   variant="standard"
-                  // onChange={handleChange}
+                  defaultValue={destination.title}
+                  onBlur={(e) =>
+                    dispatch(
+                      editDestinationKeyObject({
+                        destination: destination,
+                        content: e.target.value,
+                        key: e.target.name,
+                      })
+                    )
+                  }
                 />
               </Box>
 
@@ -103,9 +169,9 @@ const EditDestination: FC = () => {
                         labelId="active-status"
                         id="status"
                         name="status"
-                        value={destination?.status}
                         label="status"
-                        // onChange={handleChange}
+                        value={destination?.status}
+                        onChange={handleSelectChange}
                       >
                         <MenuItem value={"active"}>Active</MenuItem>
                         <MenuItem value={"unactive"}>Unactive</MenuItem>
@@ -118,9 +184,9 @@ const EditDestination: FC = () => {
                         labelId="difficulty-status"
                         id="difficulty"
                         name="difficulty"
-                        value={destination?.difficulty}
                         label="difficulty"
-                        // onChange={handleChange}
+                        value={destination?.difficulty}
+                        onChange={handleSelectChange}
                       >
                         <MenuItem value={"pemula"}>Pemula</MenuItem>
                         <MenuItem value={"menengah"}>Menengah</MenuItem>
@@ -130,15 +196,22 @@ const EditDestination: FC = () => {
 
                     <TextField
                       id="price_per_day"
+                      name="price_per_day"
                       label="Price per day"
-                      multiline
-                      maxRows={4}
-                      value={destination?.price_per_day}
                       variant="standard"
                       type="number"
                       inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
                       sx={{ mt: 1 }}
-                      // onChange={(e) => setXoxo(e.target.value)}
+                      defaultValue={destination?.price_per_day}
+                      onBlur={(e) =>
+                        dispatch(
+                          editDestinationKeyObject({
+                            destination: destination,
+                            content: Number(e.target.value),
+                            key: e.target.name,
+                          })
+                        )
+                      }
                     />
                   </Box>
 
@@ -149,9 +222,9 @@ const EditDestination: FC = () => {
                         labelId="island-label"
                         id="island"
                         name="island"
-                        value={destination?.location.island}
                         label="island"
-                        // onChange={handleChange}
+                        value={destination?.location.island}
+                        onChange={handleSelectLocationChange}
                       >
                         <MenuItem value={"jawa"}>Jawa</MenuItem>
                         <MenuItem value={"sulawesi"}>Sulawesi</MenuItem>
@@ -165,23 +238,41 @@ const EditDestination: FC = () => {
                     <TextField
                       id="city"
                       label="City"
+                      name="city"
                       multiline
                       maxRows={4}
-                      value={destination?.location.city}
                       variant="standard"
                       sx={{ mt: 1 }}
-                      // onChange={(e) => setXoxo(e.target.value)}
+                      defaultValue={destination?.location.city}
+                      onBlur={(e) =>
+                        dispatch(
+                          editDestinationLocationKeyObject({
+                            destination: destination,
+                            content: e.target.value,
+                            key: e.target.name,
+                          })
+                        )
+                      }
                     />
 
                     <TextField
                       id="province"
                       label="Province"
+                      name="province"
                       multiline
                       maxRows={4}
-                      value={destination?.location.province}
                       variant="standard"
+                      defaultValue={destination?.location.province}
                       sx={{ mt: 2 }}
-                      // onChange={(e) => setXoxo(e.target.value)}
+                      onBlur={(e) =>
+                        dispatch(
+                          editDestinationLocationKeyObject({
+                            destination: destination,
+                            content: e.target.value,
+                            key: e.target.name,
+                          })
+                        )
+                      }
                     />
                   </Box>
                 </Box>
@@ -219,7 +310,7 @@ const EditDestination: FC = () => {
             </Box>
 
             <Box p={2}>
-              <Typography fontWeight="bold" variant="subtitle1">
+              <Typography fontWeight="bold" variant="subtitle1" mb={3}>
                 Hiking Trails
               </Typography>
               <Box>
@@ -281,8 +372,29 @@ const EditDestination: FC = () => {
                   )}
                 </Box>
               </Box>
+              <Box display="flex" justifyContent="center">
+                <input
+                  id="image_upload"
+                  accept="image/*"
+                  multiple
+                  hidden
+                  type="file"
+                  onChange={(e) => setImages(e.target.files)}
+                />
+                <label htmlFor="image_upload">
+                  <Button
+                    variant="contained"
+                    component="span"
+                    size="medium"
+                    sx={{ textTransform: "none" }}
+                  >
+                    Upload Images
+                  </Button>
+                </label>
+              </Box>
             </Box>
             <Box
+              mt={5}
               p={2}
               display="flex"
               alignItems="center"
@@ -302,7 +414,7 @@ const EditDestination: FC = () => {
                 color="success"
                 size="medium"
                 sx={{ textTransform: "none", mr: 2, width: "10vw" }}
-                onClick={() => console.log("submit")}
+                onClick={submitChanges}
               >
                 Submit
               </Button>

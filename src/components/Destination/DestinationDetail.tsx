@@ -1,7 +1,6 @@
 import { FC } from "react";
-import { useAppSelector } from "../../hooks/reduxHooks";
+import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 import HikingTrailsTable from "./HikingTrailsTable";
-import SubTypography from "./View/SubTypography";
 import RulesRow from "./RulesRow";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
@@ -10,7 +9,8 @@ import Typography from "@mui/material/Typography";
 import { useParams } from "react-router-dom";
 import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
-import { Destination } from "../../interfaces";
+import { removeDestination } from "../../helpers/reduxApiCalls";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 
 const ImageContainer = styled("div")(({ theme }) => ({
   position: "relative",
@@ -26,6 +26,8 @@ const Image = styled("img")(() => ({
 const DestinationDetail: FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const axiosPrivate = useAxiosPrivate();
 
   const selectedDestination = useAppSelector((state) =>
     state?.destinations.present.destinations?.find(
@@ -39,7 +41,10 @@ const DestinationDetail: FC = () => {
     )
   );
 
-  const xx = ["status", "difficulty", "likes", "price_per_day"];
+  const deleteDestination = (): void => {
+    selectedDestination &&
+      removeDestination(dispatch, axiosPrivate, navigate, selectedDestination);
+  };
 
   return (
     <>
@@ -69,9 +74,6 @@ const DestinationDetail: FC = () => {
 
               <Box display="flex" mt={2} ml={2}>
                 <Box>
-                  {/* {xx.map((e) => (
-                    <SubTypography title={e} content={selectedDestination[e]} />
-                  ))} */}
                   <Typography variant="subtitle2" fontWeight="medium">
                     Status :
                     {" " +
@@ -192,9 +194,7 @@ const DestinationDetail: FC = () => {
                 color="error"
                 size="medium"
                 sx={{ textTransform: "none", mr: 2, width: "10vw" }}
-                onClick={() => {
-                  console.log("delete destination");
-                }}
+                onClick={deleteDestination}
               >
                 Delete
               </Button>

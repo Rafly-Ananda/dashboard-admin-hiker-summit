@@ -3,23 +3,23 @@ import {
   logoutSuccess,
   setNewToken,
 } from "../redux/slice/userSlice";
-import { fetchUsers } from "../redux/slice/usersSlice";
+import { fetchUsersSuccess, deleteUser } from "../redux/slice/usersSlice";
 import {
   destinationsActionsStart,
   destinationsActionsFailure,
   fetchdestinationsuccess,
-  editDestinationImage,
-  editDestinationGeneralInformation,
+  removeDestinationImage,
 } from "../redux/slice/destinationsSlice";
 import {
   fetchStart,
   fetchSuccess,
   fetchFailure,
 } from "../redux/slice/fetchStatusSlice";
+import { fetchBookingSuccess } from "../redux/slice/BookingsSlice";
 import { axiosPublic } from "../api/axiosInstance";
 import { Destination, User } from "../interfaces";
 
-export const login = async (dispatch: any, user: object) => {
+export const login = async (dispatch: any, user: object): Promise<void> => {
   dispatch(fetchStart());
   try {
     const { data: loggedUser } = await axiosPublic.post(
@@ -38,7 +38,7 @@ export const login = async (dispatch: any, user: object) => {
   }
 };
 
-export const logout = async (dispatch: any) => {
+export const logout = async (dispatch: any): Promise<void> => {
   dispatch(fetchStart());
   try {
     await axiosPublic.post("/api/v1/auth/logout");
@@ -49,7 +49,10 @@ export const logout = async (dispatch: any) => {
   }
 };
 
-export const setNewAccessToken = async (dispatch: any, token: string) => {
+export const setNewAccessToken = async (
+  dispatch: any,
+  token: string
+): Promise<void> => {
   dispatch(fetchStart());
   try {
     dispatch(setNewToken(token));
@@ -59,7 +62,7 @@ export const setNewAccessToken = async (dispatch: any, token: string) => {
   }
 };
 
-export const fetchDestinations = async (dispatch: any) => {
+export const fetchDestinations = async (dispatch: any): Promise<void> => {
   dispatch(destinationsActionsStart());
   try {
     const {
@@ -71,67 +74,126 @@ export const fetchDestinations = async (dispatch: any) => {
   }
 };
 
-export const setUsers = async (dispatch: any, axiosPrivate: any) => {
+export const deleteDestinationImage = async (
+  dispatch: any,
+  axiosPrivate: any,
+  key: string,
+  destination: Destination,
+  user: User
+): Promise<void> => {
+  dispatch(destinationsActionsStart());
+  const destinationForm = new FormData();
+  destinationForm.append("document", JSON.stringify(destination));
+  try {
+    const destinationId = destination._id;
+    const deleteImageS3 = axiosPublic.delete(
+      `/api/v1/assets?key=${key}&bucket=${destination.content.image_assets.bucket}`
+    );
+    const modifyDestinationAssetsRecord = axiosPrivate.put(
+      `/api/v1/destinations/${destinationId}/users/${user._id}`,
+      destinationForm
+    );
+    await Promise.allSettled([deleteImageS3, modifyDestinationAssetsRecord]);
+    dispatch(removeDestinationImage({ key, destinationId }));
+  } catch (err) {
+    dispatch(destinationsActionsFailure());
+  }
+};
+
+export const submitDestinationEditChanges = async (
+  dispatch: any,
+  axiosPrivate: any,
+  navigate: any,
+  destination: Destination,
+  user: User
+): Promise<void> => {
+  const destinationForm = new FormData();
+  destinationForm.append("document", JSON.stringify(destination));
+  try {
+    await axiosPrivate.put(
+      `/api/v1/destinations/${destination._id}/users/${user._id}`,
+      destinationForm
+    );
+    navigate(`/informations/view/${destination._id}`, { replace: true });
+  } catch (err) {
+    dispatch(destinationsActionsFailure());
+  }
+};
+
+export const removeDestination = async (
+  dispatch: any,
+  axiosPrivate: any,
+  navigate: any,
+  destination: Destination
+): Promise<void> => {
+  const destinationForm = new FormData();
+  destinationForm.append("document", JSON.stringify(destination));
+  try {
+    await axiosPrivate.delete(`/api/v1/destinations/${destination._id}`);
+    navigate(`/informations`, { replace: true });
+  } catch (err) {
+    dispatch(destinationsActionsFailure());
+  }
+};
+
+export const fetchUsers = async (
+  dispatch: any,
+  axiosPrivate: any
+): Promise<void> => {
   dispatch(fetchStart());
   try {
     const {
       data: { result },
     } = await axiosPrivate.get(`api/v1/users/`);
-    dispatch(fetchUsers(result.docs));
+    dispatch(fetchUsersSuccess(result.docs));
     dispatch(fetchSuccess());
   } catch (err) {
     dispatch(fetchStart());
   }
 };
 
-// TODO: make this redux call to only delete image, for now this only delete the image from s3 but not the assets key inside the assets_key array, better make a purger action in backend OR just make a update route only for this usage that is deleting and updating images array
-export const editDestination = async (
+export const submitUserEditChanges = async (
   dispatch: any,
   axiosPrivate: any,
-  key: string,
-  destination: Destination,
   user: User
-) => {
-  dispatch(destinationsActionsStart());
+): Promise<void> => {
+  dispatch(fetchStart());
 
-  // ! dont hard code the bucket key soo bad practice man
-  const destinationForm = new FormData();
-  destinationForm.append("document", JSON.stringify(destination));
   try {
-    const destinationId = destination._id;
-    const deleteImageS3 = axiosPublic.delete(
-      `/api/v1/assets?key=${key}&bucket=destination_assets`
-    );
-    const modifyDestinationAssetsRecord = axiosPrivate.put(
-      `/api/v1/destinations/${user._id}?destination_id=${destinationId}`,
-      destinationForm
-    );
-    await Promise.allSettled([deleteImageS3, modifyDestinationAssetsRecord]);
-
-    dispatch(editDestinationImage({ key, destinationId }));
+    await await axiosPrivate.put(`/api/v1/users/${user._id}`, user);
+    dispatch(fetchSuccess());
   } catch (err) {
     dispatch(destinationsActionsFailure());
   }
 };
 
-// export const editDestinationText = async (
-//   dispatch: any,
-//   axiosPrivate: any,
-//   destination: Destination,
-//   user: User
-// ) => {
-//   dispatch(destinationsActionsStart());
+export const removeUser = async (
+  dispatch: any,
+  axiosPrivate: any,
+  userId: string
+): Promise<void> => {
+  dispatch(fetchStart());
+  try {
+    await axiosPrivate.delete(`api/v1/users/${userId}`);
+    dispatch(deleteUser(userId));
+    dispatch(fetchSuccess());
+  } catch (err) {
+    dispatch(fetchStart());
+  }
+};
 
-//   // const destinationForm = new FormData();
-//   // destinationForm.append("document", JSON.stringify(destination));
-//   try {
-//     // const modifyDestinationAssetsRecord = axiosPrivate.put(
-//     //   `/api/v1/destinations/${user._id}?destination_id=${destination._id}`,
-//     //   destinationForm
-//     // );
-
-//     dispatch(editDestinationTextContent({ destination }));
-//   } catch (err) {
-//     dispatch(destinationsActionsFailure());
-//   }
-// };
+export const fetchBookings = async (
+  dispatch: any,
+  axiosPrivate: any
+): Promise<void> => {
+  dispatch(fetchStart());
+  try {
+    const {
+      data: { result },
+    } = await axiosPrivate.get(`api/v1/bookings?newest=true`);
+    dispatch(fetchBookingSuccess(result.docs));
+    dispatch(fetchSuccess());
+  } catch (err) {
+    dispatch(fetchStart());
+  }
+};

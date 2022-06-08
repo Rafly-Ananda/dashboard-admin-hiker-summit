@@ -28,7 +28,6 @@ const CardDetails = styled("div")(({ theme }) => ({
 }));
 
 const UserRow: FC<RowProp> = ({ user, handleDeleteUser, setOpenEditModal }) => {
-  const { destinations } = useAppSelector((state) => state.destinations);
   const [open, setOpen] = useState<boolean>(false);
   const [destinationWl, setDestinationWl] = useState();
   const navigate = useNavigate();

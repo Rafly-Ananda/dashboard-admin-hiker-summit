@@ -18,7 +18,7 @@ export interface User {
   verified: boolean;
 }
 
-interface Track {
+export interface DestinationTrack {
   description: string;
   track_name: string;
   basecamp_name: string;
@@ -27,7 +27,9 @@ interface Track {
   ward: string;
   village: string;
   postal_code: number;
-  accessibility: object;
+  accessibility: {
+    [key: string]: string;
+  };
   phone_number: number;
 }
 
@@ -43,6 +45,13 @@ export interface DestinationRules {
   };
 }
 
+export interface DestinationLocation {
+  province: string;
+  island: string;
+  city?: string;
+  track: Array<DestinationTrack>;
+}
+
 export interface Destination {
   _id: string;
   status: string;
@@ -51,26 +60,13 @@ export interface Destination {
   difficulty: string;
   likes: number;
   added_by: string;
-  location: {
-    province: string;
-    island: string;
-    city?: string;
-    track: Array<Track>;
-  };
+  location: DestinationLocation;
   content: {
     general_information: string;
     rules: DestinationRules;
-    accessibility: object;
     image_assets: {
       assets_key: Array<string>;
       bucket: string;
-    };
-    contact: {
-      name: string;
-      phone_number: string;
-      position: string;
-      location: string;
-      note: string;
     };
   };
 }
@@ -90,7 +86,7 @@ export interface Book {
   _id: string;
   user_id: string;
   destination_id: string;
-  track_route: Array<object>;
+  track_route: Array<DestinationTrack>;
   date: {
     departure: string;
     arrival: string;
@@ -102,6 +98,8 @@ export interface Book {
   }; // ? this will be a string to S3 image
   note: string;
   paid_status: string;
+  createdAt: Date;
+  payment_amount: number;
 }
 
 export interface UseLocationProps {

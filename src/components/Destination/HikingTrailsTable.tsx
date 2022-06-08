@@ -36,6 +36,32 @@ const HikingTrailsTable: FC<ComponentProps> = ({ destination }) => {
             <TableRow
               sx={{
                 td: { border: 0 },
+                m: 2,
+              }}
+            >
+              <TableCell sx={{ p: 1 }}>Basecamp</TableCell>
+              <TableCell sx={{ pl: 1, width: "93%" }} align="left">
+                <Typography variant="body2" fontWeight="bold" ml={1}>
+                  {track.basecamp_name}
+                </Typography>
+              </TableCell>
+            </TableRow>
+            <TableRow
+              sx={{
+                td: { border: 0 },
+                m: 2,
+              }}
+            >
+              <TableCell sx={{ p: 1 }}>Road</TableCell>
+              <TableCell sx={{ pl: 1, width: "93%" }} align="left">
+                <Typography variant="body2" fontWeight="bold" ml={1}>
+                  {track.road_name}
+                </Typography>
+              </TableCell>
+            </TableRow>
+            <TableRow
+              sx={{
+                td: { border: 0 },
               }}
             >
               <TableCell sx={{ p: 1, verticalAlign: "top" }}>
@@ -80,19 +106,24 @@ const HikingTrailsTable: FC<ComponentProps> = ({ destination }) => {
                 Accessibility
               </TableCell>
               <TableCell sx={{ p: 0 }}>
-                {Object.values(track.accessibility).map((point, index) => (
-                  <Table key={destination._id + point + index}>
-                    <TableBody>
-                      <TableRow>
-                        <TableCell sx={{ p: 1, width: "93%" }} align="left">
-                          <Typography variant="body2" fontWeight="bold" ml={1}>
-                            {point}
-                          </Typography>
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                ))}
+                {track.accessibility &&
+                  Object.values(track.accessibility).map((point, index) => (
+                    <Table key={destination._id + point + index}>
+                      <TableBody>
+                        <TableRow>
+                          <TableCell sx={{ p: 1, width: "93%" }} align="left">
+                            <Typography
+                              variant="body2"
+                              fontWeight="bold"
+                              ml={1}
+                            >
+                              {point}
+                            </Typography>
+                          </TableCell>
+                        </TableRow>
+                      </TableBody>
+                    </Table>
+                  ))}
               </TableCell>
             </TableRow>
             <TableRow

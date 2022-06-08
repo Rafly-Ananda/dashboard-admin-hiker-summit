@@ -1,5 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Destination, DestinationRules } from "../../interfaces";
+import {
+  Destination,
+  DestinationRules,
+  DestinationLocation,
+  DestinationTrack,
+} from "../../interfaces";
 
 interface DestinationsState {
   destinations: Destination[] | null;
@@ -34,7 +39,24 @@ export const destinationsSlice = createSlice({
       state.destinations = action.payload;
     },
 
-    editDestinationImage: (
+    // TODO: work on these
+    addDestinationImage: (
+      state,
+      action: PayloadAction<{ key: string; destinationId: string }>
+    ) => {
+      // const { destinationId, key } = action.payload;
+      // const targetDestination = state.destinations?.find(
+      //   (dest) => dest._id === destinationId
+      // );
+      // if (targetDestination) {
+      //   targetDestination.content.image_assets.assets_key =
+      //     targetDestination.content.image_assets.assets_key.filter(
+      //       (assetsKey) => assetsKey !== key
+      //     );
+      // }
+    },
+
+    removeDestinationImage: (
       state,
       action: PayloadAction<{ key: string; destinationId: string }>
     ) => {
@@ -47,6 +69,63 @@ export const destinationsSlice = createSlice({
           targetDestination.content.image_assets.assets_key.filter(
             (assetsKey) => assetsKey !== key
           );
+      }
+    },
+
+    editDestinationKeyObject: (
+      state,
+      action: PayloadAction<{
+        destination: Destination;
+        content: any;
+        key: string;
+      }>
+    ) => {
+      const targetDestination = state.destinations?.find(
+        (dest) => dest._id === action.payload.destination._id
+      );
+
+      if (targetDestination) {
+        (targetDestination[action.payload.key as keyof Destination] as any) =
+          action.payload.content;
+      }
+    },
+
+    editDestinationLocationKeyObject: (
+      state,
+      action: PayloadAction<{
+        destination: Destination;
+        content: any;
+        key: string;
+      }>
+    ) => {
+      const targetDestination = state.destinations?.find(
+        (dest) => dest._id === action.payload.destination._id
+      );
+
+      if (targetDestination) {
+        targetDestination.location[
+          action.payload.key as keyof DestinationLocation
+        ] = action.payload.content;
+      }
+    },
+
+    editDestinationLocationTrackObject: (
+      state,
+      action: PayloadAction<{
+        destination: Destination;
+        trackKey: number;
+        key: string;
+        content: any;
+      }>
+    ) => {
+      const targetDestination = state.destinations?.find(
+        (dest) => dest._id === action.payload.destination._id
+      );
+
+      if (targetDestination) {
+        (targetDestination.location.track[action.payload.trackKey][
+          action.payload.key as keyof DestinationTrack
+        ] as any) = action.payload.content;
       }
     },
 
@@ -78,10 +157,31 @@ export const destinationsSlice = createSlice({
       const targetDestination = state.destinations?.find(
         (dest) => dest._id === action.payload.destination._id
       );
+
       if (targetDestination) {
         targetDestination.content.rules[
           action.payload.field as keyof DestinationRules
         ][action.payload.key] = action.payload.content;
+      }
+    },
+
+    editAccessibilityContent: (
+      state,
+      action: PayloadAction<{
+        destination: Destination;
+        trackKey: number;
+        content: string;
+        field: string;
+      }>
+    ) => {
+      const targetDestination = state.destinations?.find(
+        (dest) => dest._id === action.payload.destination._id
+      );
+
+      if (targetDestination) {
+        targetDestination.location.track[action.payload.trackKey].accessibility[
+          action.payload.field
+        ] = action.payload.content;
       }
     },
 
@@ -114,6 +214,21 @@ export const destinationsSlice = createSlice({
       }
     },
 
+    removeLocationTrack: (
+      state,
+      action: PayloadAction<{
+        destination: Destination;
+      }>
+    ) => {
+      const targetDestination = state.destinations?.find(
+        (dest) => dest._id === action.payload.destination._id
+      );
+
+      if (targetDestination) {
+        targetDestination.location.track.pop();
+      }
+    },
+
     addAccessibilityField: (
       state,
       action: PayloadAction<{
@@ -138,6 +253,30 @@ export const destinationsSlice = createSlice({
             ).length + 1
           )]: "",
         };
+      }
+    },
+
+    removeAccessibilityField: (
+      state,
+      action: PayloadAction<{
+        destination: Destination;
+        trackKey: number;
+      }>
+    ) => {
+      const targetDestination = state.destinations?.find(
+        (dest) => dest._id === action.payload.destination._id
+      );
+
+      if (targetDestination) {
+        delete targetDestination.location.track[action.payload.trackKey]
+          .accessibility[
+          String(
+            Object.entries(
+              targetDestination.location.track[action.payload.trackKey]
+                .accessibility
+            ).length
+          )
+        ];
       }
     },
 
@@ -201,12 +340,19 @@ export const {
   destinationsActionsStart,
   destinationsActionsFailure,
   fetchdestinationsuccess,
+  editDestinationKeyObject,
+  editDestinationLocationKeyObject,
+  editDestinationLocationTrackObject,
   editDestinationGeneralInformation,
-  editDestinationImage,
   editRulesContent,
+  editAccessibilityContent,
+  addDestinationImage,
+  addRulesField,
   addLocationTrack,
   addAccessibilityField,
-  addRulesField,
+  removeDestinationImage,
+  removeLocationTrack,
+  removeAccessibilityField,
   removeRulesField,
 } = destinationsSlice.actions;
 export default destinationsSlice.reducer;

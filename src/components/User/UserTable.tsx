@@ -11,23 +11,23 @@ import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import UserRow from "./UserRow";
 import Spinner from "../Spinner/Spinner";
+import { useAppSelector } from "../../hooks/reduxHooks";
 import { User } from "../../interfaces";
 
 interface ComponentProps {
   handleDeleteUser: (id: string) => void;
   setOpenEditModal: React.Dispatch<React.SetStateAction<boolean>>;
-  isFetching: boolean;
   users: Array<User>;
 }
 
 const UserTable: FC<ComponentProps> = ({
   handleDeleteUser,
   setOpenEditModal,
-  isFetching,
   users,
 }) => {
   const [page, setPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(5);
+  const { isFetching } = useAppSelector((state) => state.fetch);
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
