@@ -5,13 +5,13 @@ import {
   editDestinationGeneralInformation,
   editDestinationKeyObject,
   editDestinationLocationKeyObject,
-} from "../../redux/slice/destinationsSlice";
+} from "../../../redux/slice/destinationsSlice";
 import {
   deleteDestinationImage,
   submitDestinationEditChanges,
-} from "../../helpers/reduxApiCalls";
-import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
-import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+} from "../../../helpers/reduxApiCalls";
+import { useAppDispatch, useAppSelector } from "../../../hooks/reduxHooks";
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -334,31 +334,33 @@ const EditDestination: FC = () => {
                   maxWidth="80%"
                 >
                   {destination.content.image_assets.assets_key.length > 0 ? (
-                    destination.content.image_assets.assets_key.map((key) => (
-                      <ImageContainer key={key}>
-                        <IconButton
-                          color="error"
-                          sx={{
-                            position: "absolute",
-                            right: 0,
-                            top: 0,
-                            p: 0,
-                          }}
-                          size="large"
-                          onClick={() => {
-                            handleDeleteImage(key);
-                          }}
-                        >
-                          <HighlightOffIcon fontSize="medium" />
-                        </IconButton>
-                        <Image
-                          src={`/api/v1/assets?bucket=${destination.content.image_assets.bucket}&key=${key}`}
-                          srcSet={`/api/v1/assets?bucket=${destination.content.image_assets.bucket}&key=${key}`}
-                          alt={key}
-                          loading="lazy"
-                        />
-                      </ImageContainer>
-                    ))
+                    destination.content.image_assets.assets_key.map(
+                      (key: string) => (
+                        <ImageContainer key={key}>
+                          <IconButton
+                            color="error"
+                            sx={{
+                              position: "absolute",
+                              right: 0,
+                              top: 0,
+                              p: 0,
+                            }}
+                            size="large"
+                            onClick={() => {
+                              handleDeleteImage(key);
+                            }}
+                          >
+                            <HighlightOffIcon fontSize="medium" />
+                          </IconButton>
+                          <Image
+                            src={`/api/v1/assets?bucket=${destination.content.image_assets.bucket}&key=${key}`}
+                            srcSet={`/api/v1/assets?bucket=${destination.content.image_assets.bucket}&key=${key}`}
+                            alt={key}
+                            loading="lazy"
+                          />
+                        </ImageContainer>
+                      )
+                    )
                   ) : (
                     <Typography
                       variant="h6"

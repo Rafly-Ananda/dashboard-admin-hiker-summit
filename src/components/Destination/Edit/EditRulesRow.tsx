@@ -3,12 +3,12 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import { Destination, DestinationRules } from "../../interfaces";
+import { Destination, DestinationRules } from "../../../interfaces";
 import {
   editRulesContent,
   addRulesField,
   removeRulesField,
-} from "../../redux/slice/destinationsSlice";
+} from "../../../redux/slice/destinationsSlice";
 
 interface ComponentProps {
   dispatch: any;

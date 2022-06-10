@@ -16,8 +16,29 @@ export const bookingsSlice = createSlice({
     fetchBookingSuccess: (state, action: PayloadAction<Array<Book>>) => {
       state.bookings = action.payload;
     },
+    acceptBooking: (state, action: PayloadAction<Book>) => {
+      const targetBooking = state.bookings?.find(
+        (booking) => booking._id === action.payload._id
+      );
+
+      if (targetBooking) {
+        targetBooking.booking_status = "accepted";
+        targetBooking.paid_status = "paid";
+      }
+    },
+    declineBooking: (state, action: PayloadAction<Book>) => {
+      const targetBooking = state.bookings?.find(
+        (booking) => booking._id === action.payload._id
+      );
+
+      if (targetBooking) {
+        targetBooking.booking_status = "declined";
+        targetBooking.paid_status = "unpaid";
+      }
+    },
   },
 });
 
-export const { fetchBookingSuccess } = bookingsSlice.actions;
+export const { fetchBookingSuccess, acceptBooking, declineBooking } =
+  bookingsSlice.actions;
 export default bookingsSlice.reducer;

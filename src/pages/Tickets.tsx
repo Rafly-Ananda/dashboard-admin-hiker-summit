@@ -1,24 +1,54 @@
-import { useState, useEffect } from "react";
+import { FC, useState, useEffect } from "react";
 import MainTable from "../components/Tickets/MainTable";
+import TicketDetail from "../components/Tickets/TicketDetail";
 import axios from "axios";
 import { useAppSelector } from "../hooks/reduxHooks";
+import { Destination, Guide, TicketsInterface } from "../interfaces";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import Spinner from "../components/Spinner/Spinner";
+import Box from "@mui/material/Box";
+import Container from "@mui/material/Container";
+import Typography from "@mui/material/Typography";
 
-const Tickets = () => {
-  const [guides, setGuides] = useState();
+const Tickets: FC = () => {
+  const axiosPrivate = useAxiosPrivate();
+  const [tickets, setTickets] = useState<Array<TicketsInterface>>([]);
   const { users } = useAppSelector((state) => state.users);
+  const [openModal, setOpenModal] = useState<boolean>(false);
+  const [isfetching, setIsFetching] = useState<boolean>(false);
 
   useEffect(() => {
     let isMounted = true;
+    setIsFetching(true);
     const controller = new AbortController();
 
     (async () => {
       try {
         const {
           data: {
-            result: { docs },
+            result: { docs: guideDocs },
           },
         } = await axios.get("/api/v1/guides");
-        isMounted && setGuides(docs.filter((e: any) => e.approved === false));
+        const {
+          data: {
+            result: { docs: destinationsDocs },
+          },
+        } = await axios.get("/api/v1/destinations");
+        const {
+          data: {
+            result: { docs: TicketDocs },
+          },
+        } = await axiosPrivate.get("/api/v1/tickets");
+
+        isMounted &&
+          setTickets(() => [
+            ...guideDocs.filter((guide: Guide) => guide.approved === "pending"),
+            ...destinationsDocs?.filter(
+              (destination: Destination) => destination.approved === "pending"
+            ),
+            ...TicketDocs,
+          ]);
+        setIsFetching(false);
       } catch (e) {
         console.warn(e);
       }
@@ -30,7 +60,65 @@ const Tickets = () => {
     };
   }, []);
 
-  return <> {users && guides && <MainTable guides={guides} users={users} />}</>;
+  return (
+    <>
+      {isfetching ? (
+        <Box
+          sx={{
+            position: "relative",
+            height: "92%",
+          }}
+        >
+          <Spinner />
+        </Box>
+      ) : (
+        <>
+          {tickets.length < 1 ? (
+            <Container
+              maxWidth="xl"
+              sx={{
+                mt: 5,
+                p: 5,
+              }}
+            >
+              <Box
+                height="40vh"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                boxShadow={3}
+                borderRadius={3}
+                sx={{ backgroundColor: "#ffffff" }}
+              >
+                <Typography variant="h5" fontWeight={700}>
+                  No Tickets Available
+                </Typography>
+              </Box>
+            </Container>
+          ) : (
+            <>
+              {users && tickets && openModal && (
+                <TicketDetail
+                  users={users}
+                  tickets={tickets}
+                  openModal={openModal}
+                  setOpenModal={setOpenModal}
+                  setTickets={setTickets}
+                />
+              )}
+              {users && tickets && (
+                <MainTable
+                  tickets={tickets}
+                  users={users}
+                  setOpenModal={setOpenModal}
+                />
+              )}
+            </>
+          )}
+        </>
+      )}
+    </>
+  );
 };
 
 export default Tickets;

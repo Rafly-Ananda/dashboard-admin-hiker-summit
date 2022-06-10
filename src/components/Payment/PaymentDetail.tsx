@@ -18,6 +18,8 @@ interface ComponentProps {
   destinations: Destination[];
   openModal: boolean;
   setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
+  approveHandler: (booking: Book) => void;
+  declinceHandler: (booking: Book) => void;
 }
 
 const ImageContainer = styled("div")(({ theme }) => ({
@@ -46,6 +48,8 @@ const PaymentDetail: FC<ComponentProps> = ({
   destinations,
   openModal,
   setOpenModal,
+  approveHandler,
+  declinceHandler,
 }) => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -72,14 +76,6 @@ const PaymentDetail: FC<ComponentProps> = ({
       lastName = user?.last_name[0]?.toUpperCase() + user?.last_name.slice(1);
     }
     return `${firstName} ${lastName}`;
-  };
-
-  const approveHandler = () => {
-    console.log("approved");
-  };
-
-  const declinceHandler = () => {
-    console.log("declined");
   };
 
   const booking = bookings.find((book) => book._id === id);
@@ -248,30 +244,42 @@ const PaymentDetail: FC<ComponentProps> = ({
                 justifyContent="center"
                 mt={4}
               >
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                  gap={4}
-                  width="80%"
-                >
-                  <Button
-                    variant="contained"
-                    color="error"
-                    fullWidth
-                    onClick={declinceHandler}
-                  >
-                    Decline
-                  </Button>
-                  <Button
-                    variant="contained"
-                    sx={{ backgroundColor: "#5de28b" }}
-                    fullWidth
-                    onClick={approveHandler}
-                  >
-                    Approve
-                  </Button>
-                </Box>
+                {booking.booking_status === "canceled" ? (
+                  <Typography>Booking Canceled By Customer.</Typography>
+                ) : (
+                  <>
+                    {booking.guide_id.length < 1 ? (
+                      <Typography>
+                        No Guide Has Accepted The Booking.
+                      </Typography>
+                    ) : (
+                      <Box
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                        gap={4}
+                        width="80%"
+                      >
+                        <Button
+                          variant="contained"
+                          color="error"
+                          fullWidth
+                          onClick={() => declinceHandler(booking)}
+                        >
+                          Decline
+                        </Button>
+                        <Button
+                          variant="contained"
+                          sx={{ backgroundColor: "#5de28b" }}
+                          fullWidth
+                          onClick={() => approveHandler(booking)}
+                        >
+                          Approve
+                        </Button>
+                      </Box>
+                    )}
+                  </>
+                )}
               </Box>
             </DialogContent>
           </Dialog>

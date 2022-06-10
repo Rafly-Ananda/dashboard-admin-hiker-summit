@@ -1,4 +1,4 @@
-import { FC } from "react";
+import React, { FC, useState } from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -6,6 +6,8 @@ import Container from "@mui/material/Container";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
+import TableFooter from "@mui/material/TableFooter";
+import TablePagination from "@mui/material/TablePagination";
 import Typography from "@mui/material/Typography";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
@@ -16,17 +18,13 @@ import { Book, User } from "../../interfaces";
 interface ComponentProps {
   bookings: Book[];
   users: User[];
-  openModal: boolean;
   setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const MainTable: FC<ComponentProps> = ({
-  bookings,
-  users,
-  openModal,
-  setOpenModal,
-}) => {
+const MainTable: FC<ComponentProps> = ({ bookings, users, setOpenModal }) => {
   const navigate = useNavigate();
+  const [rowsPerPage, setRowsPerPage] = useState<number>(5);
+  const [page, setPage] = useState<number>(0);
 
   const formatDate = (date: Date): string => {
     const baseDate = new Date(date);
@@ -39,8 +37,8 @@ const MainTable: FC<ComponentProps> = ({
   };
 
   const getUser = (id: string): string => {
-    const user = users?.find((user) => user._id === id);
     let firstName, lastName;
+    const user = users?.find((user) => user._id === id);
     if (user) {
       firstName =
         user?.first_name[0]?.toUpperCase() + user?.first_name?.slice(1);
@@ -48,6 +46,20 @@ const MainTable: FC<ComponentProps> = ({
     }
     return `${firstName} ${lastName}`;
   };
+
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const emptyRows =
+    page > 0 ? Math.max(0, page * rowsPerPage - users.length) : 0;
 
   return (
     <Container
@@ -98,7 +110,13 @@ const MainTable: FC<ComponentProps> = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {bookings.map((book) => (
+            {(rowsPerPage > 0
+              ? bookings.slice(
+                  page * rowsPerPage,
+                  page * rowsPerPage + rowsPerPage
+                )
+              : bookings
+            ).map((book) => (
               <TableRow
                 key={book._id}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
@@ -129,20 +147,40 @@ const MainTable: FC<ComponentProps> = ({
                 </TableCell>
                 <TableCell align="left">{formatDate(book.createdAt)}</TableCell>
                 <TableCell align="left">
-                  <Typography
-                    fontWeight={600}
-                    variant="subtitle1"
-                    color="#fff"
-                    sx={{
-                      backgroundColor:
-                        book.paid_status === "paid" ? "#5de28b" : "#fec400",
-                      textAlign: "center",
-                      width: "7vw",
-                      borderRadius: 5,
-                    }}
-                  >
-                    {book.paid_status}
-                  </Typography>
+                  {book.booking_status !== "canceled" ? (
+                    <Typography
+                      fontWeight={600}
+                      variant="subtitle1"
+                      color="#fff"
+                      sx={{
+                        backgroundColor:
+                          book.booking_status === "accepted"
+                            ? "#5de28b"
+                            : book.booking_status === "declined"
+                            ? "red"
+                            : "#fec400",
+                        textAlign: "center",
+                        width: "7vw",
+                        borderRadius: 5,
+                      }}
+                    >
+                      {book.booking_status}
+                    </Typography>
+                  ) : (
+                    <Typography
+                      fontWeight={600}
+                      variant="subtitle1"
+                      color="#fff"
+                      sx={{
+                        backgroundColor: "red",
+                        textAlign: "center",
+                        width: "7vw",
+                        borderRadius: 5,
+                      }}
+                    >
+                      {book.booking_status}
+                    </Typography>
+                  )}
                 </TableCell>
                 <TableCell align="left">
                   <Button
@@ -158,7 +196,27 @@ const MainTable: FC<ComponentProps> = ({
                 </TableCell>
               </TableRow>
             ))}
+            {emptyRows > 0 && (
+              <TableRow style={{ height: 53 * emptyRows }}>
+                <TableCell colSpan={5} />
+              </TableRow>
+            )}
           </TableBody>
+          <TableFooter>
+            <TableRow>
+              <TablePagination
+                rowsPerPageOptions={[5, 10]}
+                labelRowsPerPage={<span>Rows Per Page : </span>}
+                count={bookings.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                showFirstButton={true}
+                showLastButton={true}
+              />
+            </TableRow>
+          </TableFooter>
         </Table>
       </TableContainer>
     </Container>

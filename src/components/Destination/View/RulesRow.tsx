@@ -6,7 +6,7 @@ import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
-import { Destination, DestinationRules } from "../../interfaces";
+import { Destination, DestinationRules } from "../../../interfaces";
 
 interface ComponentProps {
   destination: Destination;
@@ -26,14 +26,16 @@ const RulesRow: FC<ComponentProps> = ({ destination }) => {
                 <TableBody>
                   {Object.values(e[1]).map((point, index) => (
                     <TableRow
-                      key={point + index}
+                      key={(point as keyof DestinationRules) + index}
                       sx={{
                         td: { border: 0 },
                       }}
                     >
                       <TableCell width={1}>{index + 1}.</TableCell>
                       <TableCell align="left">
-                        <Typography variant="body2">{point}</Typography>
+                        <Typography variant="body2">
+                          {point as keyof DestinationRules}
+                        </Typography>
                       </TableCell>
                     </TableRow>
                   ))}

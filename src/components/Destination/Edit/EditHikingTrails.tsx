@@ -3,7 +3,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import { Destination } from "../../interfaces";
+import { Destination } from "../../../interfaces";
 import {
   addLocationTrack,
   removeLocationTrack,
@@ -11,7 +11,7 @@ import {
   removeAccessibilityField,
   editAccessibilityContent,
   editDestinationLocationTrackObject,
-} from "../../redux/slice/destinationsSlice";
+} from "../../../redux/slice/destinationsSlice";
 
 interface ComponentProps {
   destination: Destination;

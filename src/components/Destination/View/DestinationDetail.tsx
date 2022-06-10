@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
+import { useAppDispatch, useAppSelector } from "../../../hooks/reduxHooks";
 import HikingTrailsTable from "./HikingTrailsTable";
 import RulesRow from "./RulesRow";
 import Container from "@mui/material/Container";
@@ -9,8 +9,10 @@ import Typography from "@mui/material/Typography";
 import { useParams } from "react-router-dom";
 import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
-import { removeDestination } from "../../helpers/reduxApiCalls";
-import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import { removeDestination } from "../../../helpers/reduxApiCalls";
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
+import { submitDestinationEditChanges } from "../../../helpers/reduxApiCalls";
+import { editDestinationKeyObject } from "../../../redux/slice/destinationsSlice";
 
 const ImageContainer = styled("div")(({ theme }) => ({
   position: "relative",
@@ -28,6 +30,7 @@ const DestinationDetail: FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const axiosPrivate = useAxiosPrivate();
+  const { currentUser } = useAppSelector((state) => state.user);
 
   const selectedDestination = useAppSelector((state) =>
     state?.destinations.present.destinations?.find(
@@ -37,13 +40,32 @@ const DestinationDetail: FC = () => {
 
   const user = useAppSelector((state) =>
     state?.users?.users?.find(
-      (user) => user._id === selectedDestination?.added_by
+      (user) => user._id === selectedDestination?.user_id
     )
   );
 
   const deleteDestination = (): void => {
     selectedDestination &&
       removeDestination(dispatch, axiosPrivate, navigate, selectedDestination);
+  };
+
+  const approveHandler = () => {
+    if (selectedDestination && currentUser) {
+      dispatch(
+        editDestinationKeyObject({
+          destination: selectedDestination,
+          content: true,
+          key: "approved",
+        })
+      );
+      submitDestinationEditChanges(
+        dispatch,
+        axiosPrivate,
+        navigate,
+        { ...selectedDestination, approved: "approved" },
+        currentUser
+      );
+    }
   };
 
   return (
@@ -183,31 +205,59 @@ const DestinationDetail: FC = () => {
                 </Box>
               </Box>
             </Box>
-            <Box
-              p={2}
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-            >
-              <Button
-                variant="contained"
-                color="error"
-                size="medium"
-                sx={{ textTransform: "none", mr: 2, width: "10vw" }}
-                onClick={deleteDestination}
+            {selectedDestination.approved === "pending" ? (
+              <Box
+                p={2}
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
               >
-                Delete
-              </Button>
-              <Button
-                variant="contained"
-                color="primary"
-                size="medium"
-                sx={{ textTransform: "none", mr: 2, width: "10vw" }}
-                onClick={() => navigate(`/informations/edit/${id}`)}
+                <Button
+                  variant="contained"
+                  color="error"
+                  size="medium"
+                  sx={{ textTransform: "none", mr: 2, width: "10vw" }}
+                  onClick={deleteDestination}
+                >
+                  Delete
+                </Button>
+                <Button
+                  variant="contained"
+                  color="success"
+                  size="medium"
+                  sx={{ textTransform: "none", mr: 2, width: "10vw" }}
+                  onClick={approveHandler}
+                >
+                  Approve
+                </Button>
+              </Box>
+            ) : (
+              <Box
+                p={2}
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
               >
-                Edit
-              </Button>
-            </Box>
+                <Button
+                  variant="contained"
+                  color="error"
+                  size="medium"
+                  sx={{ textTransform: "none", mr: 2, width: "10vw" }}
+                  onClick={deleteDestination}
+                >
+                  Delete
+                </Button>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  size="medium"
+                  sx={{ textTransform: "none", mr: 2, width: "10vw" }}
+                  onClick={() => navigate(`/informations/edit/${id}`)}
+                >
+                  Edit
+                </Button>
+              </Box>
+            )}
           </Box>
         </Container>
       )}

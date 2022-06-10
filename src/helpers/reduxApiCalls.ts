@@ -15,9 +15,13 @@ import {
   fetchSuccess,
   fetchFailure,
 } from "../redux/slice/fetchStatusSlice";
-import { fetchBookingSuccess } from "../redux/slice/BookingsSlice";
+import {
+  acceptBooking,
+  declineBooking,
+  fetchBookingSuccess,
+} from "../redux/slice/BookingsSlice";
 import { axiosPublic } from "../api/axiosInstance";
-import { Destination, User } from "../interfaces";
+import { Destination, User, Book } from "../interfaces";
 
 export const login = async (dispatch: any, user: object): Promise<void> => {
   dispatch(fetchStart());
@@ -193,6 +197,46 @@ export const fetchBookings = async (
     } = await axiosPrivate.get(`api/v1/bookings?newest=true`);
     dispatch(fetchBookingSuccess(result.docs));
     dispatch(fetchSuccess());
+  } catch (err) {
+    dispatch(fetchStart());
+  }
+};
+
+export const acceptBookingRequest = async (
+  dispatch: any,
+  axiosPrivate: any,
+  navigate: any,
+  booking: Book
+): Promise<void> => {
+  dispatch(fetchStart());
+  try {
+    await axiosPrivate.put(`api/v1/bookings/status/${booking._id}`, {
+      paid_status: "paid",
+      booking_status: "accepted",
+    });
+    dispatch(acceptBooking(booking));
+    dispatch(fetchSuccess());
+    navigate("/payments", { replace: true });
+  } catch (err) {
+    dispatch(fetchStart());
+  }
+};
+
+export const declineBookingRequest = async (
+  dispatch: any,
+  axiosPrivate: any,
+  navigate: any,
+  booking: Book
+): Promise<void> => {
+  dispatch(fetchStart());
+  try {
+    await axiosPrivate.put(`api/v1/bookings/status/${booking._id}`, {
+      paid_status: "unpaid",
+      booking_status: "declined",
+    });
+    dispatch(declineBooking(booking));
+    dispatch(fetchSuccess());
+    navigate("/payments", { replace: true });
   } catch (err) {
     dispatch(fetchStart());
   }

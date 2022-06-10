@@ -1,5 +1,5 @@
 import { FC, useState } from "react";
-import { User, Destination } from "../interfaces";
+import { User } from "../interfaces";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import UserTable from "../components/User/UserTable";
 import UserEditForm from "../components/User/UserEditForm";

@@ -11,7 +11,7 @@ import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
 import { useAppSelector } from "../../hooks/reduxHooks";
-import InformationRow from "./InformationRow";
+import InformationRow from "./View/InformationRow";
 
 interface ComponentProps {
   tableTitle: string;

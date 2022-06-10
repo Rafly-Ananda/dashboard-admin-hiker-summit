@@ -12,8 +12,8 @@ export interface User {
   destination_wishlist: Array<string>;
   user_status: string;
   is_admin: boolean;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
   accessToken: string;
   verified: boolean;
 }
@@ -59,7 +59,7 @@ export interface Destination {
   price_per_day: string;
   difficulty: string;
   likes: number;
-  added_by: string;
+  user_id: string;
   location: DestinationLocation;
   content: {
     general_information: string;
@@ -69,6 +69,9 @@ export interface Destination {
       bucket: string;
     };
   };
+  approved: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface Guide {
@@ -80,26 +83,48 @@ export interface Guide {
   allowed_hiker_count: number;
   status: string;
   about_me: string;
+  approved: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface Book {
   _id: string;
   user_id: string;
   destination_id: string;
+  guide_id: string;
   track_route: Array<DestinationTrack>;
   date: {
     departure: string;
     arrival: string;
   };
   hiker_count: number;
+  payment_deadline: number;
+  payment_amount: number;
   proof_of_payment: {
     bucket: string;
     assets_key: string;
-  }; // ? this will be a string to S3 image
+  };
   note: string;
   paid_status: string;
+  booking_status: string;
   createdAt: Date;
-  payment_amount: number;
+  updatedAt: Date;
+}
+
+export interface Tickets {
+  _id: string;
+  user_id: string;
+  destination_id: string;
+  subject: string;
+  details: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface TicketsInterface extends Destination, Guide, Tickets {
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface UseLocationProps {

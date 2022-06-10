@@ -1,4 +1,4 @@
-import InformationsTable from "./InformationsTable";
+import InformationsTable from "../InformationsTable";
 const InformationsHome = () => {
   const islands = [
     "jawa",
