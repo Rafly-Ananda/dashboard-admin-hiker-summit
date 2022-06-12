@@ -15,7 +15,6 @@ const Overview: FC = () => {
   const [isFetching, setIsFetching] = useState(false);
   const axiosPrivate = useAxiosPrivate();
 
-  // TODO : make a filtration system here
   const createData = (title: string, result: number) => {
     return { title, result };
   };
@@ -23,16 +22,17 @@ const Overview: FC = () => {
   const ticketRows = [
     createData(
       "Mengajukan menjadi pemandu",
-      guides.filter((guide) => guide.status === "unactive").length
+      guides.filter((guide: Guide) => guide.approved === "pending").length
     ),
     createData(
       "Menyewa pemandu",
-      bookings.filter((book) => book.paid_status === "unpaid").length
+      bookings.filter((book) => book.booking_status === "pending").length
     ),
     createData(
       "Menyarankan informasi gunung",
-      destinations.filter((destination) => destination.status === "unactive")
-        .length
+      destinations.filter(
+        (destination: Destination) => destination.approved === "pending"
+      ).length
     ),
   ];
 
@@ -50,11 +50,11 @@ const Overview: FC = () => {
   const paymentRows = [
     createData(
       "Konfirmasi bukti pembayaran",
-      bookings.filter((book) => book.paid_status === "unpaid").length
+      bookings.filter((book) => book.booking_status === "pending").length
     ),
     createData(
       "Selesai",
-      bookings.filter((book) => book.paid_status === "paid").length
+      bookings.filter((book) => book.booking_status === "accepted").length
     ),
   ];
 
@@ -96,33 +96,36 @@ const Overview: FC = () => {
     const controller = new AbortController();
 
     const fetchTableData = async (): Promise<void> => {
-      // TODO: use promise.all here
+      setIsFetching(true);
+
       try {
-        setIsFetching(true);
-        const { data: Users } = await axiosPrivate.get(`/api/v1/users`, {
-          signal: controller.signal,
-        });
+        const [Users, Destinations, Guides, Bookings] =
+          await Promise.allSettled([
+            axiosPrivate.get(`/api/v1/users`, {
+              signal: controller.signal,
+            }),
+            await axiosPrivate.get(`/api/v1/destinations`, {
+              signal: controller.signal,
+            }),
+            await axiosPrivate.get(`/api/v1/guides`, {
+              signal: controller.signal,
+            }),
+            await axiosPrivate.get(`/api/v1/bookings`, {
+              signal: controller.signal,
+            }),
+          ]);
 
-        const { data: Destinations } = await axiosPrivate.get(
-          `/api/v1/destinations`,
-          {
-            signal: controller.signal,
-          }
-        );
-
-        const { data: Guides } = await axiosPrivate.get(`/api/v1/guides`, {
-          signal: controller.signal,
-        });
-
-        const { data: Bookings } = await axiosPrivate.get(`/api/v1/bookings`, {
-          signal: controller.signal,
-        });
-
-        if (isMounted) {
-          setUsers(Users.result.docs);
-          setDestinations(Destinations.result.docs);
-          setGuides(Guides.result.docs);
-          setBookings(Bookings.result.docs);
+        if (
+          isMounted &&
+          Users.status === "fulfilled" &&
+          Guides.status === "fulfilled" &&
+          Destinations.status === "fulfilled" &&
+          Bookings.status === "fulfilled"
+        ) {
+          setUsers(Users.value.data.result.docs);
+          setGuides(Guides.value.data.result.docs);
+          setDestinations(Destinations.value.data.result.docs);
+          setBookings(Bookings.value.data.result.docs);
           setIsFetching(false);
         }
       } catch (e: unknown) {
