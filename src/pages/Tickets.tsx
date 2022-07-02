@@ -1,7 +1,7 @@
 import { FC, useState, useEffect } from "react";
 import MainTable from "../components/Tickets/MainTable";
 import TicketDetail from "../components/Tickets/TicketDetail";
-import axios from "axios";
+import { axiosPublic } from "../api/axiosInstance";
 import { useAppSelector } from "../hooks/reduxHooks";
 import { Destination, Guide, TicketsInterface } from "../interfaces";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
@@ -28,12 +28,12 @@ const Tickets: FC = () => {
           data: {
             result: { docs: guideDocs },
           },
-        } = await axios.get("/api/v1/guides");
+        } = await axiosPublic.get("/api/v1/guides");
         const {
           data: {
             result: { docs: destinationsDocs },
           },
-        } = await axios.get("/api/v1/destinations");
+        } = await axiosPublic.get("/api/v1/destinations");
         const {
           data: {
             result: { docs: TicketDocs },
@@ -58,6 +58,12 @@ const Tickets: FC = () => {
       isMounted = false;
       controller.abort();
     };
+  }, []);
+
+  useEffect(() => {
+    const foo = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    const sum = foo.reduce((a, b) => a + b);
+    console.log(sum);
   }, []);
 
   return (
